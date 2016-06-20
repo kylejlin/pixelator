@@ -28,17 +28,12 @@
         
         bigPixelWidth = Math.floor(bigPixelWidth);
         bigPixelHeight = Math.floor(bigPixelHeight);
-    
+        
         var pixels = this.pixelCollection.pixels,
             length = pixels.length,
-            newImageBytes = new Uint8ClampedArray(this.pixelCollection.width * this.pixelCollection.height * 4),
-            i, j, k;
-        
-        for (i = 0; i < length; i++) {
-            var pixel = pixels[i];
-            // I think this is wrong. Fix tomorrow.
-            
-        }
+            newImageBytes = new Uint8ClampedArray(this.pixelCollection.pixels.length * 4),
+            sections = this.pixelCollection.getAllSections(bigPixelWidth, bigPixelHeight),
+            i;
     };
     
     function RGBAPixelCollection(imageData) {
@@ -76,6 +71,24 @@
         }
         
         return {data: simpleImageData, width: this.width, height: this.height};
+    };
+    
+    RGBAPixelCollection.prototype.getDimensionsInSections = function (sectionWidth, sectionHeight) {
+        return {
+            width: this.width / sectionWidth,
+            height: this.height / sectionHeight
+        };
+    };
+    
+    RGBAPixelCollection.prototype.getAllSections = function (sectionWidth, sectionHeight) {
+        var sections = [],
+            width = this.getDimensionsInSections(sectionWidth, sectionHeight).width,
+            height = this.getDimensionsInSections(sectionWidth, sectionHeight).height,
+            pixels = this.pixels,
+            length = pixels.length,
+            i;
+        
+        // Fix it later.
     };
     
     window['Pixelator'] = Pixelator;
