@@ -36,22 +36,25 @@
             i;
     };
     
-    function RGBAPixelCollection(imageData) {
-        this.width = imageData.width;
-        this.height = imageData.height;
-        this.pixels = [];
-        
-        var data = imageData.data,
-            length = data.length,
-            i;
+    function RGBAPixelCollection(imageDataOrSize) {
+        if (imageDataOrSize instanceof (ImageData || function(){})) {
+            var image
+            this.width = imageData.width;
+            this.height = imageData.height;
+            this.pixels = [];
             
-        for (i = 0; i < length; i+= 4) {
-            var red = data[i],
-                green = data[i + 1],
-                blue = data[i + 2],
-                alpha = data[i + 3];
+            var data = imageData.data,
+                length = data.length,
+                i;
                 
-            this.pixels.push({r: red, g: green, b: blue, a: alpha});
+            for (i = 0; i < length; i+= 4) {
+                var red = data[i],
+                    green = data[i + 1],
+                    blue = data[i + 2],
+                    alpha = data[i + 3];
+                    
+                this.pixels.push({r: red, g: green, b: blue, a: alpha});
+            }
         }
     }
     
@@ -82,14 +85,30 @@
     
     RGBAPixelCollection.prototype.getAllSections = function (sectionWidth, sectionHeight) {
         var sections = [],
-            width = this.getDimensionsInSections(sectionWidth, sectionHeight).width,
-            height = this.getDimensionsInSections(sectionWidth, sectionHeight).height,
+            width = Math.ceil(this.getDimensionsInSections(sectionWidth, sectionHeight).width),
+            height = Math.ceil(this.getDimensionsInSections(sectionWidth, sectionHeight).height),
+            howManySections = width * height,
             pixels = this.pixels,
             length = pixels.length,
-            i;
+            section;
         
-        // Fix it later.
+        for (section = 0; section < length; section++) {
+            if (section % width)
+        }
     };
+    
+    RGBAPixelCollection.prototype.getSection = function (x, y, width, height) {
+        var section = new RGBAPixelCollection(),
+            pixels = section.pixels
+            row,
+            col;
+        
+        for (row = y; row < height; row++) {
+            for (col = x; col < width; col++) {
+                section[row * width + col] 
+            }
+        }
+    }
     
     window['Pixelator'] = Pixelator;
 })();
