@@ -10,7 +10,28 @@
     }
     
     Pixelator.prototype.pixelate = function (sectionWidth, sectionHeight) {
-        // Work on this tomorrow. GBMH.
+        var sectionsInfo = this.getAllSectionsInfo(sectionWidth, sectionHeight);
+        
+        for (var i = 0; i < sectionsInfo.length; i++) {
+            var sectionInfo = sectionsInfo[i],
+                x = sectionInfo.x,
+                y = sectionInfo.y,
+                w = sectionInfo.width,
+                h = sectionInfo.height,
+                sectionIndices = this.pixelCollection.getIndicesInRect(x, y, w, h),
+                sumColor = {r: 0, g: 0, b: 0, a: 0};
+            
+            for (var j = 0; j < sectionIndices.length; j++) {
+                var pixel = sectionIndices[j];
+                
+                sumColor.r += pixel.r;
+                sumColor.g += pixel.g;
+                sumColor.b += pixel.b;
+                sumColor.a += pixel.a;
+            }
+            
+            // Work on later. :)
+        }
     };
     
     function RGBAPixelCollection (imageData) {
