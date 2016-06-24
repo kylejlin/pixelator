@@ -33,7 +33,7 @@
             
             if (filters.length) {
                 for (var f = 0; f < filters.length; f++) {
-                    var filter = filters[f];
+                    filters[f].applyFilter();
                 }
             }
         }
