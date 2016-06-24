@@ -10,10 +10,11 @@
     }
     
     Pixelator.prototype.pixelate = function (sectionWidth, sectionHeight) {
-        var sectionsInfo = this.getAllSectionsInfo(sectionWidth, sectionHeight);
+        var allSectionInfo = this.getAllSectionInfo(sectionWidth, sectionHeight),
+            filters = this.filters_;
         
-        for (var i = 0; i < sectionsInfo.length; i++) {
-            var sectionInfo = sectionsInfo[i],
+        for (var i = 0; i < allSectionInfo.length; i++) {
+            var sectionInfo = allSectionInfo[i],
                 x = sectionInfo.x,
                 y = sectionInfo.y,
                 w = sectionInfo.width,
@@ -30,8 +31,16 @@
                 sumColor.a += pixel.a;
             }
             
-            // Work on later. :)
+            if (filters.length) {
+                for (var f = 0; f < filters.length; f++) {
+                    var filter = filters[f];
+                }
+            }
         }
+    };
+    
+    Pixelator.prototype.getAllSectionsInfo = function (sectionWidth, sectionHeight) {
+        
     };
     
     function RGBAPixelCollection (imageData) {
