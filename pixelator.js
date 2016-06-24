@@ -36,14 +36,15 @@
         }
     }
     
-    RGBAPixelCollection.prototype.getIndicesInRect = function (startX, startY, width, height) {
+    RGBAPixelCollection.prototype.getIndicesInRect = function (startX, startY, rectWidth, rectHeight) {
         var indices = [],
-            endX = startX + width - 1,
-            endY = startY + height - 1;
+            endX = startX + rectWidth - 1,
+            endY = startY + rectHeight - 1,
+            collectionWidth = this.width;
         
         for (var row = startY; row <= endY; row++) {
             for (var rowCell = startX; rowCell = endX; rowCell++) {
-                indices.push(row * width + rowCell);
+                indices.push(row * collectionWidth + rowCell);
             }
         }
     };
