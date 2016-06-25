@@ -11,7 +11,8 @@
     
     Pixelator.prototype.pixelate = function (sectionWidth, sectionHeight) {
         var allSectionInfo = this.getAllSectionInfo(sectionWidth, sectionHeight),
-            filters = this.filters_;
+            filters = this.filters_,
+            pixelatedImage = this.pixelCollection.clone();
         
         for (var i = 0; i < allSectionInfo.length; i++) {
             var sectionInfo = allSectionInfo[i],
@@ -20,9 +21,11 @@
                 w = sectionInfo.width,
                 h = sectionInfo.height,
                 sectionIndices = this.pixelCollection.getIndicesInRect(x, y, w, h),
-                sumColor = {r: 0, g: 0, b: 0, a: 0};
+                numberOfPixels = sectionIndices.length,
+                sumColor = {r: 0, g: 0, b: 0, a: 0},
+                averageColor = {};
             
-            for (var j = 0; j < sectionIndices.length; j++) {
+            for (var j = 0; j < numberOfPixels; j++) {
                 var pixel = sectionIndices[j];
                 
                 sumColor.r += pixel.r;
@@ -31,16 +34,59 @@
                 sumColor.a += pixel.a;
             }
             
-            if (filters.length) {
-                for (var f = 0; f < filters.length; f++) {
-                    filters[f].applyFilter();
-                }
+            averageColor.r = Math.round(sumColor.r / numberOfPixels);
+            averageColor.g = Math.round(sumColor.g / numberOfPixels);
+            averageColor.b = Math.round(sumColor.b / numberOfPixels):
+            averageColor.a = Math.round(sumColor.a / numberOfPixels);
+            
+            for (j = 0; j < sectionIndices.length; j++) {
+                
+            }
+            
+            for (var f = 0; f < filter.length; f++) {
+                filters[f].applyFilter(sumColor, this);
             }
         }
     };
     
-    Pixelator.prototype.getAllSectionsInfo = function (sectionWidth, sectionHeight) {
+    Pixelator.prototype.getAllSectionInfo = function (sectionWidth, sectionHeight) {
+        var allSectionInfo = [],
+            x = 0,
+            y = 0,
+            endX = this.width - 1,
+            endY = this.hieght - 1;
         
+        while (endY - y >= sectionHeight) {
+            x = 0;
+            
+            while (endX - x >= sectionWidth) {
+                allSectionInfo.push({x: x, y: y, width: sectionWidth, height: sectionHeight});
+                
+                x += sectionWidth;
+            }
+            
+            if (x < endX) {
+                allSectionInfo.push({x: x, y: y, width: endX - x, height: sectionHeight})
+            }
+            
+            y + = sectionHeight;
+        }
+        
+        if (y < endY) {
+            x = 0;
+            
+            while (endX - x >= sectionWidth) {
+                allSectionInfo.push({x: x, y: y, width: sectionWidth, height: endY - y});
+                
+                x += sectionWidth;
+            }
+            
+            if (x < endX) {
+                allSectionInfo.push({x: x, y: y, width: endX - x, height: endY - y});
+            }
+        }
+        
+        return allSectionInfo;
     };
     
     function RGBAPixelCollection (imageData) {
@@ -77,5 +123,7 @@
                 indices.push(row * collectionWidth + rowCell);
             }
         }
+        
+        return indices;
     };
 })();
