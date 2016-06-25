@@ -39,12 +39,12 @@
             averageColor.b = Math.round(sumColor.b / numberOfPixels):
             averageColor.a = Math.round(sumColor.a / numberOfPixels);
             
-            for (j = 0; j < sectionIndices.length; j++) {
-                
-            }
-            
             for (var f = 0; f < filter.length; f++) {
                 filters[f].applyFilter(sumColor, this);
+            }
+            
+            for (j = 0; j < sectionIndices.length; j++) {
+                pixelatedImage.setPixelByIndex(sectionIndices[j], averageColor);
             }
         }
     };
