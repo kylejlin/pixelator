@@ -17,12 +17,16 @@
         
         for (var i = 0; i < allSectionInfo.length; i++) {
             var sectionInfo = allSectionInfo[i],
+                
                 x = sectionInfo.x,
                 y = sectionInfo.y,
                 w = sectionInfo.width,
                 h = sectionInfo.height,
+                
                 sectionIndices = this.pixelCollection.getIndicesInRect(x, y, w, h),
+                
                 numberOfPixels = sectionIndices.length,
+                
                 sumColor = {r: 0, g: 0, b: 0, a: 0},
                 averageColor = {};
             
@@ -54,8 +58,10 @@
     
     Pixelator.prototype.getAllSectionInfo = function (sectionWidth, sectionHeight) {
         var allSectionInfo = [],
+        
             x = 0,
             y = 0,
+            
             endX = this.width - 1,
             endY = this.hieght - 1;
         
