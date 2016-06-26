@@ -191,6 +191,28 @@
     
     RGBAPixelColleciton.prototype.toImage = function () {
         var canvas = document.createElement('canvas'),
-            ctx = canvas.getContext('2d');
+            ctx = canvas.getContext('2d'),
+            
+            image = document.createElement('img'),
+            
+            pixels = this.pixels,
+            size = pixels.length,
+            
+            width = this.width,
+            height = this.height;
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        for (var i = 0; i < size; i++) {
+            var pixel = pixels[i];
+            
+            ctx.fillStyle = 'rgba(' + pixel.r + ',' + pixel.g + ',' + pixel.b + ',' + pixel.a + ')';
+            ctx.fillRect(i % width, Math.floor(i / width), 1, 1);
+        }
+        
+        image.src = ctx.toDataURL();
+        
+        return image;
     };
 })();
