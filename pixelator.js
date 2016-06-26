@@ -7,6 +7,7 @@
         this.width = imageData.width;
         this.height = imageData.height;
         this.pixelCollection = new RGBAPixelCollection(imageData);
+        this.rawImageData = imageData;
     }
     
     Pixelator.prototype.pixelate = function (sectionWidth, sectionHeight) {
@@ -47,6 +48,8 @@
                 pixelatedImage.setPixelByIndex(sectionIndices[j], averageColor);
             }
         }
+        
+        return pixelatedImage;
     };
     
     Pixelator.prototype.getAllSectionInfo = function (sectionWidth, sectionHeight) {
@@ -89,6 +92,8 @@
         return allSectionInfo;
     };
     
+    Pixelator.prototype.filters_ = [];
+    
     function RGBAPixelCollection (imageData) {
         if (!(imageData instanceof Object && typeof imageData.width === 'number' && typeof imageData.height === 'number')) {
             throw new TypeError('The first argument passed into the RGBAPixelCollection constructor was not a valid ImageData object.');
@@ -101,7 +106,9 @@
         var data = imageData.data;
         
         if (data instanceof Uint8ClampedArray) {
-            for (var i = 0; i < imageData.data.length; i+= 4) {
+            this.raw = imageData;
+            
+            for (var i = 0; i < data.length; i+= 4) {
                 this.pixels.push({
                     r: data[i],
                     g: data[i + 1],
@@ -109,6 +116,19 @@
                     a: data[i + 3]
                 });
             }
+        } else {
+            var size = this.width * this.height;
+            
+            for (var i = 0; i < size; i++) {
+                this.pixels.push({
+                    r: 0,
+                    g: 0,
+                    b: 0,
+                    a: 255
+                });
+            }
+            
+            this.raw = this.toSimpleImageData();
         }
     }
     
@@ -125,5 +145,52 @@
         }
         
         return indices;
+    };
+    
+    RGBAPixelCollection.prototype.setPixelByIndex = function (index, color) {
+        if (!(index in this.pixels)) {
+            throw new RangeError('The index argument (' + JSON.stringify(index) + ') is not a valid index.');
+        }
+        
+        if (!(color instanceof Object && 'r' in color && 'g' in color && 'b' in color && 'a' in color)) {
+            throw new TypeError('The color argument (' + JSON.stringify(color) + ') is not a valid color.');
+        }
+        
+        var pixel = this.pixels[index];
+        
+        pixel.r = color.r;
+        pixel.g = color.g;
+        pixel.b = color.b;
+        pixel.a = color.a;
+        
+        return pixel;
+    };
+    
+    RGBAPixelCollection.prototype.clone = function () {
+        return new RGBAPixelCollection(this.raw);
+    };
+    
+    RGBAPixelCollection.prototype.toSimpleImageData = function () {
+        var imageData = {width: this.width, height: this.height},
+            pixels = this.pixels,
+            data = new Uint8ClampedArray(this.width * this.height);
+        
+        for (var i = 0; i < pixels.length; i+= 4) {
+            var currentPixel = pixels[i];
+            
+            data[i] = currentPixel.r;
+            data[i + 1] = currentPixel.g;
+            data[i + 2] = currentPixel.b;
+            data[i + 3] = currentPixel.a;
+        }
+        
+        imageData.data = data;
+        
+        return imageData;
+    };
+    
+    RGBAPixelColleciton.prototype.toImage = function () {
+        var canvas = document.createElement('canvas'),
+            ctx = canvas.getContext('2d');
     };
 })();
