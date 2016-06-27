@@ -32,7 +32,7 @@ var demo = (function () {
                 
                 pixelator = new Pixelator(ctx.getImageData(0, 0, width, height));
                 
-                afterImg.src = pixelator.pixelate().toDataURL();
+                afterImg.src = pixelator.pixelate(2, 2).toDataURL();
             });
             
             reader.readAsDataURL(file);
