@@ -41,7 +41,7 @@
             
             averageColor.r = Math.round(sumColor.r / numberOfPixels);
             averageColor.g = Math.round(sumColor.g / numberOfPixels);
-            averageColor.b = Math.round(sumColor.b / numberOfPixels):
+            averageColor.b = Math.round(sumColor.b / numberOfPixels);
             averageColor.a = Math.round(sumColor.a / numberOfPixels);
             
             for (var f = 0; f < filter.length; f++) {
