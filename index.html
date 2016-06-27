@@ -3,12 +3,38 @@
 <head>
   <meta charset="utf-8">
   <title>pixelator</title>
+  
+  <base href="/pixelator/"/>
+  
+  <link rel="stylesheet" href="css/pixelator.css"/>
+  <link rel="icon" href="images/favicon.png" type="image/png"/>
 </head>
 <body>
+  <div id="background"></div>
+  
+  <h1>Pixelator</h1>
+  
+  <p>
+    Upload an image to pixelate it!
+  </p>
   <input type="file" id="upload"/>
-  <canvas id="preview-image"></canvas>
-  <a id="download"><img src="/download-btn.png"/></a>
-  <script src="/pixelator.js"></script>
-  <!-- TODO: Initialize a Pixelator instance in the script tag. -->
+  
+  <p>
+    Before pixelation:
+  </p>
+  <img id="before"/>
+  
+  <p>
+    After pixelation:
+  </p>
+  <img id="after"/>
+  
+  <p>
+    Click below to download the pixelated image.
+  </p>
+  <a id="download"><img src="images/download-btn.png"/></a>
+  
+  <script src="js/pixelator.js"></script>
+  <script src="js/demo.js"></script>
 </body>
 </html>

@@ -41,7 +41,7 @@
             
             averageColor.r = Math.round(sumColor.r / numberOfPixels);
             averageColor.g = Math.round(sumColor.g / numberOfPixels);
-            averageColor.b = Math.round(sumColor.b / numberOfPixels):
+            averageColor.b = Math.round(sumColor.b / numberOfPixels);
             averageColor.a = Math.round(sumColor.a / numberOfPixels);
             
             for (var f = 0; f < filter.length; f++) {
@@ -63,7 +63,7 @@
             y = 0,
             
             endX = this.width - 1,
-            endY = this.hieght - 1;
+            endY = this.height - 1;
         
         while (endY - y >= sectionHeight) {
             x = 0;
@@ -78,7 +78,7 @@
                 allSectionInfo.push({x: x, y: y, width: endX - x, height: sectionHeight})
             }
             
-            y + = sectionHeight;
+            y += sectionHeight;
         }
         
         if (y < endY) {
@@ -195,7 +195,7 @@
         return imageData;
     };
     
-    RGBAPixelColleciton.prototype.toImage = function () {
+    RGBAPixelCollection.prototype.toImage = function () {
         var canvas = document.createElement('canvas'),
             ctx = canvas.getContext('2d'),
             
@@ -217,8 +217,33 @@
             ctx.fillRect(i % width, Math.floor(i / width), 1, 1);
         }
         
-        image.src = ctx.toDataURL();
+        image.src = canvas.toDataURL();
         
         return image;
     };
+    
+    RGBAPixelCollection.prototype.toDataURL = function () {
+        var canvas = document.createElement('canvas'),
+            ctx = canvas.getContext('2d'),
+            
+            pixels = this.pixels,
+            size = pixels.length,
+            
+            width = this.width,
+            height = this.height;
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        for (var i = 0; i < size; i++) {
+            var pixel = pixels[i];
+            
+            ctx.fillStyle = 'rgba(' + pixel.r + ',' + pixel.g + ',' + pixel.b + ',' + pixel.a + ')';
+            ctx.fillRect(i % width, Math.floor(i / width), 1, 1);
+        }
+        
+        return canvas.toDataURL();
+    };
+    
+    window['Pixelator'] = Pixelator;
 })();
