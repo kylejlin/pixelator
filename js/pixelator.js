@@ -63,7 +63,7 @@
             y = 0,
             
             endX = this.width - 1,
-            endY = this.hieght - 1;
+            endY = this.height - 1;
         
         while (endY - y >= sectionHeight) {
             x = 0;
