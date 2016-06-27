@@ -217,7 +217,7 @@
             ctx.fillRect(i % width, Math.floor(i / width), 1, 1);
         }
         
-        image.src = ctx.toDataURL();
+        image.src = canvas.toDataURL();
         
         return image;
     };
@@ -242,7 +242,7 @@
             ctx.fillRect(i % width, Math.floor(i / width), 1, 1);
         }
         
-        return ctx.toDataURL();
+        return canvas.toDataURL();
     };
     
     window['Pixelator'] = Pixelator;
