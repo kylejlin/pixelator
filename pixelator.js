@@ -1,137 +1,224 @@
 (function () {
-    function Pixelator(image) {
-        var canvas = document.createElement('canvas'),
-            ctx = canvas.getContext('2d'),
-            width = image.width,
-            height = image.height,
-            imageData;
+    function Pixelator(imageData) {
+        if (!(imageData instanceof Object && typeof imageData.width === 'number' && typeof imageData.height === 'number' && (imageData.data) instanceof Uint8ClampedArray)) {
+            throw new TypeError('The first argument passed into the Pixelator constructor was not a valid ImageData object.');
+        }
         
-        this.width = width;
-        this.height = height;
-        
-        canvas.width = width;
-        canvas.height = height;
-        
-        ctx.drawImage(image, 0, 0, width, height);
-        
-        imageData = ctx.getImageData(0, 0, width, height);
+        this.width = imageData.width;
+        this.height = imageData.height;
         this.pixelCollection = new RGBAPixelCollection(imageData);
+        this.rawImageData = imageData;
     }
-
-    Pixelator.prototype.pixelize = function (bigPixelWidth, bigPixelHeight) {
-        if (typeof bigPixelWidth !== 'number' || bigPixelWidth <= 0) {
-            throw new TypeError('The width argument (arguments[0]) must be a non-zero number!');
-        }
-        if (typeof bigPixelHeight !== 'number' || bigPixelHeight <= 0) {
-            throw new TypeError('The height argument (arguments[1]) must be a non-zero number!');
+    
+    Pixelator.prototype.pixelate = function (sectionWidth, sectionHeight) {
+        var allSectionInfo = this.getAllSectionInfo(sectionWidth, sectionHeight),
+            filters = this.filters_,
+            pixelatedImage = this.pixelCollection.clone();
+        
+        for (var i = 0; i < allSectionInfo.length; i++) {
+            var sectionInfo = allSectionInfo[i],
+                
+                x = sectionInfo.x,
+                y = sectionInfo.y,
+                w = sectionInfo.width,
+                h = sectionInfo.height,
+                
+                sectionIndices = this.pixelCollection.getIndicesInRect(x, y, w, h),
+                
+                numberOfPixels = sectionIndices.length,
+                
+                sumColor = {r: 0, g: 0, b: 0, a: 0},
+                averageColor = {};
+            
+            for (var j = 0; j < numberOfPixels; j++) {
+                var pixel = sectionIndices[j];
+                
+                sumColor.r += pixel.r;
+                sumColor.g += pixel.g;
+                sumColor.b += pixel.b;
+                sumColor.a += pixel.a;
+            }
+            
+            averageColor.r = Math.round(sumColor.r / numberOfPixels);
+            averageColor.g = Math.round(sumColor.g / numberOfPixels);
+            averageColor.b = Math.round(sumColor.b / numberOfPixels):
+            averageColor.a = Math.round(sumColor.a / numberOfPixels);
+            
+            for (var f = 0; f < filter.length; f++) {
+                filters[f].applyFilter(sumColor, this);
+            }
+            
+            for (j = 0; j < sectionIndices.length; j++) {
+                pixelatedImage.setPixelByIndex(sectionIndices[j], averageColor);
+            }
         }
         
-        bigPixelWidth = Math.floor(bigPixelWidth);
-        bigPixelHeight = Math.floor(bigPixelHeight);
-        
-        var pixels = this.pixelCollection.pixels,
-            length = pixels.length,
-            newImageBytes = new Uint8ClampedArray(this.pixelCollection.pixels.length * 4),
-            sections = this.pixelCollection.getAllSections(bigPixelWidth, bigPixelHeight),
-            i;
+        return pixelatedImage;
     };
     
-    function RGBAPixelCollection(imageData) {
-        if (!(imageData instanceof Object && typeof (imageData.width) === 'number' && typeof (imageData.height) === 'number')) {
-            throw new TypeError('imageData.width and imageData.height must be numbers.');
+    Pixelator.prototype.getAllSectionInfo = function (sectionWidth, sectionHeight) {
+        var allSectionInfo = [],
+        
+            x = 0,
+            y = 0,
+            
+            endX = this.width - 1,
+            endY = this.hieght - 1;
+        
+        while (endY - y >= sectionHeight) {
+            x = 0;
+            
+            while (endX - x >= sectionWidth) {
+                allSectionInfo.push({x: x, y: y, width: sectionWidth, height: sectionHeight});
+                
+                x += sectionWidth;
+            }
+            
+            if (x < endX) {
+                allSectionInfo.push({x: x, y: y, width: endX - x, height: sectionHeight})
+            }
+            
+            y + = sectionHeight;
+        }
+        
+        if (y < endY) {
+            x = 0;
+            
+            while (endX - x >= sectionWidth) {
+                allSectionInfo.push({x: x, y: y, width: sectionWidth, height: endY - y});
+                
+                x += sectionWidth;
+            }
+            
+            if (x < endX) {
+                allSectionInfo.push({x: x, y: y, width: endX - x, height: endY - y});
+            }
+        }
+        
+        return allSectionInfo;
+    };
+    
+    Pixelator.prototype.filters_ = [];
+    
+    function RGBAPixelCollection (imageData) {
+        if (!(imageData instanceof Object && typeof imageData.width === 'number' && typeof imageData.height === 'number')) {
+            throw new TypeError('The first argument passed into the RGBAPixelCollection constructor was not a valid ImageData object.');
         }
         
         this.width = imageData.width;
         this.height = imageData.height;
         this.pixels = [];
         
-        if (imageData.data) {
-            var data = imageData.data,
-                length = data.length,
-                i;
-                
-            for (i = 0; i < length; i+= 4) {
-                var red = data[i],
-                    green = data[i + 1],
-                    blue = data[i + 2],
-                    alpha = data[i + 3];
-                    
-                this.pixels.push({r: red, g: green, b: blue, a: alpha});
+        var data = imageData.data;
+        
+        if (data instanceof Uint8ClampedArray) {
+            this.raw = imageData;
+            
+            for (var i = 0; i < data.length; i+= 4) {
+                this.pixels.push({
+                    r: data[i],
+                    g: data[i + 1],
+                    b: data[i + 2],
+                    a: data[i + 3]
+                });
             }
         } else {
-            var size = this.width * this.height,
-                i;
+            var size = this.width * this.height;
             
-            for (i = 0; i < size; i++) {
-                this.pixels.push({r: 0, g: 0, b: 0, a: 255});
+            for (var i = 0; i < size; i++) {
+                this.pixels.push({
+                    r: 0,
+                    g: 0,
+                    b: 0,
+                    a: 255
+                });
             }
+            
+            this.raw = this.toSimpleImageData();
         }
     }
+    
+    RGBAPixelCollection.prototype.getIndicesInRect = function (startX, startY, rectWidth, rectHeight) {
+        var indices = [],
+            endX = startX + rectWidth - 1,
+            endY = startY + rectHeight - 1,
+            collectionWidth = this.width;
+        
+        for (var row = startY; row <= endY; row++) {
+            for (var rowCell = startX; rowCell = endX; rowCell++) {
+                indices.push(row * collectionWidth + rowCell);
+            }
+        }
+        
+        return indices;
+    };
+    
+    RGBAPixelCollection.prototype.setPixelByIndex = function (index, color) {
+        if (!(index in this.pixels)) {
+            throw new RangeError('The index argument (' + JSON.stringify(index) + ') is not a valid index.');
+        }
+        
+        if (!(color instanceof Object && 'r' in color && 'g' in color && 'b' in color && 'a' in color)) {
+            throw new TypeError('The color argument (' + JSON.stringify(color) + ') is not a valid color.');
+        }
+        
+        var pixel = this.pixels[index];
+        
+        pixel.r = color.r;
+        pixel.g = color.g;
+        pixel.b = color.b;
+        pixel.a = color.a;
+        
+        return pixel;
+    };
+    
+    RGBAPixelCollection.prototype.clone = function () {
+        return new RGBAPixelCollection(this.raw);
+    };
     
     RGBAPixelCollection.prototype.toSimpleImageData = function () {
-        var simpleImageData = new Uint8ClampedArray(this.pixels.length * 4),
-            length = simpleImageData.length,
-            i;
+        var imageData = {width: this.width, height: this.height},
+            pixels = this.pixels,
+            data = new Uint8ClampedArray(this.width * this.height);
         
-        for (i = 0; i < length; i++) {
-            var pixel = this.pixels[i],
-                dataIndexBase = i * 4;
+        for (var i = 0; i < pixels.length; i+= 4) {
+            var currentPixel = pixels[i];
             
-            simpleImageData[dataIndexBase] = pixel.r;
-            simpleImageData[dataIndexBase + 1] = pixel.g;
-            simpleImageData[dataIndexBase + 2] = pixel.b;
-            simpleImageData[dataIndexBase + 3] = pixel.a;
+            data[i] = currentPixel.r;
+            data[i + 1] = currentPixel.g;
+            data[i + 2] = currentPixel.b;
+            data[i + 3] = currentPixel.a;
         }
         
-        return {data: simpleImageData, width: this.width, height: this.height};
+        imageData.data = data;
+        
+        return imageData;
     };
     
-    RGBAPixelCollection.prototype.getDimensionsInSections = function (sectionWidth, sectionHeight) {
-        return {
-            width: this.width / sectionWidth,
-            height: this.height / sectionHeight
-        };
-    };
-    
-    RGBAPixelCollection.prototype.getAllSections = function (sectionWidth, sectionHeight) {
-        var sections = [],
-            width = Math.ceil(this.getDimensionsInSections(sectionWidth, sectionHeight).width),
-            height = Math.ceil(this.getDimensionsInSections(sectionWidth, sectionHeight).height),
-            howManySections = width * height,
+    RGBAPixelColleciton.prototype.toImage = function () {
+        var canvas = document.createElement('canvas'),
+            ctx = canvas.getContext('2d'),
+            
+            image = document.createElement('img'),
+            
             pixels = this.pixels,
-            length = pixels.length,
-            section;
+            size = pixels.length,
+            
+            width = this.width,
+            height = this.height;
         
-        for (section = 0; section < howManySections; section++) {
-            if (width - (section % width) === 1) {
-                sections.push(this.getSection((section % width) * sectionWidth, Math.floor(section / height), this.width - sectionWidth * width, sectionHeight);
-            } else {
-                sections.push(this.getSection((section % width) * sectionWidth, Math.floor(section / height), sectionWidth, sectionHeight);
-            }
+        canvas.width = width;
+        canvas.height = height;
+        
+        for (var i = 0; i < size; i++) {
+            var pixel = pixels[i];
+            
+            ctx.fillStyle = 'rgba(' + pixel.r + ',' + pixel.g + ',' + pixel.b + ',' + pixel.a + ')';
+            ctx.fillRect(i % width, Math.floor(i / width), 1, 1);
         }
         
-        return sections;
+        image.src = ctx.toDataURL();
+        
+        return image;
     };
-    
-    RGBAPixelCollection.prototype.getSection = function (x, y, width, height) {
-        var section = new RGBAPixelCollection({width: width, height: height}),
-            sectionPixels = section.pixels,
-            pixels = this.pixels,
-            endX = x + width,
-            endY = y + height,
-            row,
-            col;
-        
-        section.pixels = [];
-        
-        for (row = y; row < endY; row++) {
-            for (col = x; col < endX; col++) {
-                sectionPixels.push(pixels[row * this.width + col]);
-            }
-        }
-        
-        return section;
-    }
-    
-    window['Pixelator'] = Pixelator;
 })();
