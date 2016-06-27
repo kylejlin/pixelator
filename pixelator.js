@@ -221,4 +221,6 @@
         
         return image;
     };
+    
+    window['Pixelator'] = Pixelator;
 })();
