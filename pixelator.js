@@ -222,5 +222,28 @@
         return image;
     };
     
+    RGBAPixelColleciton.prototype.toDataURL = function () {
+        var canvas = document.createElement('canvas'),
+            ctx = canvas.getContext('2d'),
+            
+            pixels = this.pixels,
+            size = pixels.length,
+            
+            width = this.width,
+            height = this.height;
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        for (var i = 0; i < size; i++) {
+            var pixel = pixels[i];
+            
+            ctx.fillStyle = 'rgba(' + pixel.r + ',' + pixel.g + ',' + pixel.b + ',' + pixel.a + ')';
+            ctx.fillRect(i % width, Math.floor(i / width), 1, 1);
+        }
+        
+        return ctx.toDataURL();
+    };
+    
     window['Pixelator'] = Pixelator;
 })();
