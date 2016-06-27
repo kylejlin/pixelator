@@ -1,6 +1,6 @@
 (function () {
     function Pixelator(imageData) {
-        if (!(imageData instanceof Object && typeof imageData.width === 'number' && typeof imageData.height === 'number' && (imageData.data) instanceof Uint8ClampedArray)) {
+        if (!validateProps(imageData, Object, 'width', 'number', 'height', 'number', 'data', Uint8ClampedArray)) {
             throw new TypeError('The first argument passed into the Pixelator constructor was not a valid ImageData object.');
         }
         
@@ -11,97 +11,17 @@
     }
     
     Pixelator.prototype.pixelate = function (sectionWidth, sectionHeight) {
-        var allSectionInfo = this.getAllSectionInfo(sectionWidth, sectionHeight),
-            filters = this.filters_,
-            pixelatedImage = this.pixelCollection.clone();
         
-        for (var i = 0; i < allSectionInfo.length; i++) {
-            var sectionInfo = allSectionInfo[i],
-                
-                x = sectionInfo.x,
-                y = sectionInfo.y,
-                w = sectionInfo.width,
-                h = sectionInfo.height,
-                
-                sectionIndices = this.pixelCollection.getIndicesInRect(x, y, w, h),
-                
-                numberOfPixels = sectionIndices.length,
-                
-                sumColor = {r: 0, g: 0, b: 0, a: 0},
-                averageColor = {};
-            
-            for (var j = 0; j < numberOfPixels; j++) {
-                var pixel = sectionIndices[j];
-                
-                sumColor.r += pixel.r;
-                sumColor.g += pixel.g;
-                sumColor.b += pixel.b;
-                sumColor.a += pixel.a;
-            }
-            
-            averageColor.r = Math.round(sumColor.r / numberOfPixels);
-            averageColor.g = Math.round(sumColor.g / numberOfPixels);
-            averageColor.b = Math.round(sumColor.b / numberOfPixels);
-            averageColor.a = Math.round(sumColor.a / numberOfPixels);
-            
-            for (var f = 0; f < filter.length; f++) {
-                filters[f].applyFilter(sumColor, this);
-            }
-            
-            for (j = 0; j < sectionIndices.length; j++) {
-                pixelatedImage.setPixelByIndex(sectionIndices[j], averageColor);
-            }
-        }
-        
-        return pixelatedImage;
     };
     
-    Pixelator.prototype.getAllSectionInfo = function (sectionWidth, sectionHeight) {
-        var allSectionInfo = [],
+    Pixelator.prototype.getAllSections = function (sectionWidth, sectionHeight) {
         
-            x = 0,
-            y = 0,
-            
-            endX = this.width - 1,
-            endY = this.height - 1;
-        
-        while (endY - y >= sectionHeight) {
-            x = 0;
-            
-            while (endX - x >= sectionWidth) {
-                allSectionInfo.push({x: x, y: y, width: sectionWidth, height: sectionHeight});
-                
-                x += sectionWidth;
-            }
-            
-            if (x < endX) {
-                allSectionInfo.push({x: x, y: y, width: endX - x, height: sectionHeight})
-            }
-            
-            y += sectionHeight;
-        }
-        
-        if (y < endY) {
-            x = 0;
-            
-            while (endX - x >= sectionWidth) {
-                allSectionInfo.push({x: x, y: y, width: sectionWidth, height: endY - y});
-                
-                x += sectionWidth;
-            }
-            
-            if (x < endX) {
-                allSectionInfo.push({x: x, y: y, width: endX - x, height: endY - y});
-            }
-        }
-        
-        return allSectionInfo;
     };
     
     Pixelator.prototype.filters_ = [];
     
     function RGBAPixelCollection (imageData) {
-        if (!(imageData instanceof Object && typeof imageData.width === 'number' && typeof imageData.height === 'number')) {
+        if (!validateProps(imageData, Object, 'width', 'number', 'height', 'number')) {
             throw new TypeError('The first argument passed into the RGBAPixelCollection constructor was not a valid ImageData object.');
         }
         
@@ -244,6 +164,18 @@
         
         return canvas.toDataURL();
     };
+    
+    function validateProps(obj, constructor) {
+        if (obj === undefined || obj === null || typeof constructor !== 'function' || !(obj instanceof constructor)) {
+            return false;
+        }
+        
+        var numOfArgs = arguments.length;
+        
+        for (var i = 2; i < numOfArgs; i += 2) {
+            
+        }
+    }
     
     window['Pixelator'] = Pixelator;
 })();
