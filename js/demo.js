@@ -7,7 +7,7 @@ var demo = (function () {
     fileInput.addEventListener('change', function () {
         var file = fileInput.files[0];
         
-        if (file instanceof File && /\.(jpe?p|png|gif)$/i.test(file.name)) {
+        if (file instanceof File && /\.(jpe?g|png|gif)$/i.test(file.name)) {
             var reader = new FileReader(),
                 canvas = document.createElement('canvas'),
                 ctx = canvas.getContext('2d');
@@ -32,7 +32,7 @@ var demo = (function () {
                 
                 pixelator = new Pixelator(ctx.getImageData(0, 0, width, height));
                 
-                afterImg.src = pixelator.pixelate().toDataURL();
+                afterImg.src = pixelator.pixelate(2, 2).toDataURL();
             });
             
             reader.readAsDataURL(file);
