@@ -195,7 +195,7 @@
         return imageData;
     };
     
-    RGBAPixelColleciton.prototype.toImage = function () {
+    RGBAPixelCollection.prototype.toImage = function () {
         var canvas = document.createElement('canvas'),
             ctx = canvas.getContext('2d'),
             
