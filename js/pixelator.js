@@ -78,7 +78,7 @@
                 allSectionInfo.push({x: x, y: y, width: endX - x, height: sectionHeight})
             }
             
-            y + = sectionHeight;
+            y += sectionHeight;
         }
         
         if (y < endY) {
