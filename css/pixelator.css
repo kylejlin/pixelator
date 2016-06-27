@@ -1,3 +1,10 @@
 body {
   font-family: Verdana, Geneva, sans-serif;
+  color: #ffffff;
+  
+  background: #ffcc00;
+  background: -webkit-linear-gradient(#ffcc00, #ffe066);
+  background: -o-linear-gradient(#ffcc00, #ffe066);
+  background: -moz-linear-gradient(#ffcc00, #ffe066);
+  background: linear-gradient(#ffcc00, #ffe066);
 }
