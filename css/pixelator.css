@@ -4,7 +4,7 @@ body {
   
   background-color: #ffcc00;
   background-image: -webkit-linear-gradient(#ffcc00, #ffe066);
-  background-image: -o-linear-gradient(#ffcc00, #ffe066);
   background-image: -moz-linear-gradient(#ffcc00, #ffe066);
+  background-image: -o-linear-gradient(#ffcc00, #ffe066);
   background-image: linear-gradient(#ffcc00, #ffe066);
 }
