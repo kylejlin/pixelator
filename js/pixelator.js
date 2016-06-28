@@ -175,13 +175,14 @@
         
         for (var i = 2; i < numOfArgs; i += 2) {
             var prop = arguments[i],
-                propType = arguments[i + 1];
+                propType = arguments[i + 1],
+                propTypeType = typeof propType;
             
-            if (typeof propType === 'function' && !(prop instanceof propType)) {
-                return false;
-            }
-            
-            if (typeof propType === 'string' && typeof prop === propType) {
+            if (
+                (propTypeType === 'function' && !(prop instanceof propType)) ||
+                (propTypeType === 'string' && typeof prop !== propType) ||
+                (propTypeType !== 'function' || propTypeType !== 'string')
+            ) {
                 return false;
             }
         }
