@@ -11,7 +11,18 @@
     }
     
     Pixelator.prototype.pixelate = function (sectionWidth, sectionHeight) {
+        var sections = this.getAllSections(sectionWidth, sectionHeight),
+            canvas = document.createElement('canvas'),
+            ctx = canvas.getContext('2d'),
+            i = sections.length;
         
+        while (i--) {
+            var section = sections[i],
+                average = Pixelator.getAverageColor(section);
+            
+            ctx.fillStyle = 'rgba(' + average.r + ',' + average.g + ',' + average.b + ',' average.a + ')';
+            ctx.fillRect(section.x, section.y, section.width, section.height);
+        }
     };
     
     Pixelator.prototype.getAllSections = function (sectionWidth, sectionHeight) {
@@ -35,23 +46,13 @@
             this.raw = imageData;
             
             for (var i = 0; i < data.length; i+= 4) {
-                this.pixels.push({
-                    r: data[i],
-                    g: data[i + 1],
-                    b: data[i + 2],
-                    a: data[i + 3]
-                });
+                this.pixels.push(new RGBAColor(data[i], data[i + 1], data[i + 2], data[i + 3]));
             }
         } else {
             var size = this.width * this.height;
             
             for (var i = 0; i < size; i++) {
-                this.pixels.push({
-                    r: 0,
-                    g: 0,
-                    b: 0,
-                    a: 255
-                });
+                this.pixels.push(new RGBAColor(0, 0, 0, 255));
             }
             
             this.raw = this.toSimpleImageData();
@@ -173,8 +174,19 @@
         var numOfArgs = arguments.length;
         
         for (var i = 2; i < numOfArgs; i += 2) {
+            var prop = arguments[i],
+                propType = arguments[i + 1];
             
+            if (typeof propType === 'function' && !(prop instanceof propType)) {
+                return false;
+            }
+            
+            if (typeof propType === 'string' && typeof prop === propType) {
+                return false;
+            }
         }
+        
+        return true;
     }
     
     window['Pixelator'] = Pixelator;
