@@ -167,14 +167,14 @@
     };
     
     function validateProps(obj, constructor) {
-        if (obj === undefined || obj === null || typeof constructor !== 'function' || !(obj instanceof constructor)) {
+        if (!(obj instanceof Object) || typeof constructor !== 'function' || !(obj instanceof constructor)) {
             return false;
         }
         
         var numOfArgs = arguments.length;
         
         for (var i = 2; i < numOfArgs; i += 2) {
-            var prop = arguments[i],
+            var prop = obj[arguments[i]],
                 propType = arguments[i + 1],
                 propTypeType = typeof propType;
             
