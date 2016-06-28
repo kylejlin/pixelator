@@ -232,13 +232,15 @@
     };
     
     RGBA.prototype.isValid = function () {
-        function isClampedUint8 (num) {
-            return !!(
+        function isUint8 (num) {
+            return (
                 num === parseInt(num, 10) &&
                 num <= 255 &&
                 num >= 0
             );
         }
+        
+        return (isUint8(this.r) && isUint8(this.g) && isUint8(this.b) && isUint8(this.a));
     };
     
     window['Pixelator'] = Pixelator;
