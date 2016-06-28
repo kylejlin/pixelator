@@ -93,9 +93,11 @@
         return pixel;
     };
     
+    /*
     RGBAPixelCollection.prototype.clone = function () {
         return new RGBAPixelCollection(this.raw);
     };
+    */
     
     RGBAPixelCollection.prototype.toSimpleImageData = function () {
         var imageData = {width: this.width, height: this.height},
@@ -116,6 +118,7 @@
         return imageData;
     };
     
+    /*
     RGBAPixelCollection.prototype.toImage = function () {
         var canvas = document.createElement('canvas'),
             ctx = canvas.getContext('2d'),
@@ -165,6 +168,7 @@
         
         return canvas.toDataURL();
     };
+    */
     
     function validateProps(obj, constructor) {
         if (!(obj instanceof Object) || typeof constructor !== 'function' || !(obj instanceof constructor)) {
@@ -189,6 +193,53 @@
         
         return true;
     }
+    
+    function multiValueTypeCheck(type) {
+        var typeType = typeof type,
+            i = arguments.length;
+        
+        if (typeType === 'function') {
+            while (--i) { // Skip first argument (which is the type argument).
+                if (!(arguments[i] instanceof type)) {
+                    return false;
+                }
+            }
+        } else if (typeType === 'string') {
+            while (--i) {
+                if (typeof arguments[i] !== type) {
+                    return false;
+                }
+            }
+        } else return true;
+    }
+    
+    function RGBAColor(red, green, blue, alpha) {
+        if (!multiValueTypeCheck('number', red, green, blue, alpha)) {
+            throw new TypeError('Exactly four numbers must be provided as arguments to the RGBAColor constructor.');
+        }
+        
+        this.r = red;
+        this.g = green;
+        this.b = blue;
+        this.a = alpha;
+    }
+    
+    RGBA.prototype = {
+        r: 0,
+        g: 0,
+        b: 0,
+        a: 255
+    };
+    
+    RGBA.prototype.isValid = function () {
+        function isClampedUint8 (num) {
+            return !!(
+                num === parseInt(num, 10) &&
+                num <= 255 &&
+                num >= 0
+            );
+        }
+    };
     
     window['Pixelator'] = Pixelator;
 })();
