@@ -181,7 +181,7 @@
             if (
                 (propTypeType === 'function' && !(prop instanceof propType)) ||
                 (propTypeType === 'string' && typeof prop !== propType) ||
-                (propTypeType !== 'function' || propTypeType !== 'string')
+                (propTypeType !== 'function' && propTypeType !== 'string')
             ) {
                 return false;
             }
