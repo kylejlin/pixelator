@@ -46,13 +46,13 @@
             this.raw = imageData;
             
             for (var i = 0; i < data.length; i+= 4) {
-                this.pixels.push(new RGBAColor(data[i], data[i + 1], data[i + 2], data[i + 3]));
+                this.pixels.push(new RGBAColor(data[i], data[i + 1], data[i + 2], data[i + 3], true));
             }
         } else {
             var size = this.width * this.height;
             
             for (var i = 0; i < size; i++) {
-                this.pixels.push(new RGBAColor(0, 0, 0, 255));
+                this.pixels.push(new RGBAColor(0, 0, 0, 255, true));
             }
             
             this.raw = this.toSimpleImageData();
@@ -213,9 +213,9 @@
         } else return true;
     }
     
-    function RGBAColor(red, green, blue, alpha) {
-        if (!multiValueTypeCheck('number', red, green, blue, alpha)) {
-            throw new TypeError('Exactly four numbers must be provided as arguments to the RGBAColor constructor.');
+    function RGBAColor(red, green, blue, alpha, opt_skipValidation) {
+        if (opt_skipValidation || !this.isValid.call({r: red, g: green, b: blue, a: alpha})) {
+            throw new TypeError('Exactly four unsigned 8-bit integers must be provided as arguments to the RGBAColor constructor.');
         }
         
         this.r = red;
