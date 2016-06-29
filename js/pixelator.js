@@ -26,7 +26,8 @@
     };
     
     Pixelator.prototype.getAllSections = function (sectionWidth, sectionHeight) {
-        
+        var rightEdgeSectionX = this.width - this.width % sectionWidth,
+            bottomEdgeSectionY = this.Height - this.height % sectionHeight;
     };
     
     Pixelator.prototype.filters_ = [];
