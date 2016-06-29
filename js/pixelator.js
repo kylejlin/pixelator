@@ -26,8 +26,37 @@
     };
     
     Pixelator.prototype.getAllSections = function (sectionWidth, sectionHeight) {
-        var rightEdgeSectionX = this.width - this.width % sectionWidth,
-            bottomEdgeSectionY = this.Height - this.height % sectionHeight;
+        var sections = [],
+            
+            rightEdgeSectionWidth = this.width % sectionWidth,
+            bottomEdgeSectionHeight = this.height % sectionHeight,
+            
+            rightEdgeSectionX = this.width - rightEdgeSectionWidth,
+            bottomEdgeSectionY = this.height - bottomEdgeSectionHeight;
+        
+        function addAllSectionsForRow(y, height) {
+            sections.push(new Section(rightEdgeSectionX, y, rightEdgeSectionWidth, height));
+            
+            var x = rightEdgeSectionX - sectionWidth;
+            
+            while (x >= 0) {
+                sections.push(new Section(x, y, sectionWidth, height));
+                
+                x -= sectioWidth;
+            }
+        }
+        
+        addAllSectionsForRow(bottomEdgeSectionY, bottomEdgeSectionHeight);
+        
+        var y = bottomEdgeSectionY - sectionHeight;
+        
+        while (y >= 0) {
+            addAllSectionsForRow(y, sectionHeight);
+            
+            y -= sectionHeight;
+        }
+        
+        return sections;
     };
     
     Pixelator.prototype.filters_ = [];
@@ -47,13 +76,13 @@
             this.raw = imageData;
             
             for (var i = 0; i < data.length; i+= 4) {
-                this.pixels.push(new RGBAColor(data[i], data[i + 1], data[i + 2], data[i + 3], true));
+                this.pixels.push(new RGBAColor(data[i], data[i + 1], data[i + 2], data[i + 3]));
             }
         } else {
             var size = this.width * this.height;
             
             for (var i = 0; i < size; i++) {
-                this.pixels.push(new RGBAColor(0, 0, 0, 255, true));
+                this.pixels.push(new RGBAColor(0, 0, 0, 255));
             }
             
             this.raw = this.toSimpleImageData();
@@ -214,15 +243,11 @@
         } else return true;
     }
     
-    function RGBAColor(red, green, blue, alpha, opt_skipValidation) {
-        if (opt_skipValidation || !this.isValid.call({r: red, g: green, b: blue, a: alpha})) {
-            throw new TypeError('Exactly four unsigned 8-bit integers must be provided as arguments to the RGBAColor constructor.');
-        }
-        
-        this.r = red;
-        this.g = green;
-        this.b = blue;
-        this.a = alpha;
+    function RGBAColor(red, green, blue, alpha) {
+        this.r = red & 255;
+        this.g = green & 255;
+        this.b = blue &  255;
+        this.a = alpha & 255;
     }
     
     RGBA.prototype = {
@@ -230,18 +255,6 @@
         g: 0,
         b: 0,
         a: 255
-    };
-    
-    RGBA.prototype.isValid = function () {
-        function isUint8 (num) {
-            return (
-                num === parseInt(num, 10) &&
-                num <= 255 &&
-                num >= 0
-            );
-        }
-        
-        return (isUint8(this.r) && isUint8(this.g) && isUint8(this.b) && isUint8(this.a));
     };
     
     window['Pixelator'] = Pixelator;
