@@ -135,6 +135,7 @@
         return indices;
     };
     
+    /*
     RGBAPixelCollection.prototype.setPixelByIndex = function (index, color) {
         if (!(index in this.pixels)) {
             throw new RangeError('The index argument (' + JSON.stringify(index) + ') is not a valid index.');
@@ -153,6 +154,7 @@
         
         return pixel;
     };
+    */
     
     /*
     RGBAPixelCollection.prototype.clone = function () {
@@ -160,6 +162,7 @@
     };
     */
     
+    /*
     RGBAPixelCollection.prototype.toSimpleImageData = function () {
         var imageData = {width: this.width, height: this.height},
             pixels = this.pixels,
@@ -178,6 +181,7 @@
         
         return imageData;
     };
+    */
     
     /*
     RGBAPixelCollection.prototype.toImage = function () {
