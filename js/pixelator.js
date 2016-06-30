@@ -23,6 +23,8 @@
             ctx.fillStyle = 'rgba(' + average.r + ',' + average.g + ',' + average.b + ',' average.a + ')';
             ctx.fillRect(section.x, section.y, section.width, section.height);
         }
+        
+        return ctx;
     };
     
     Pixelator.prototype.getAllSections = function (sectionWidth, sectionHeight) {
@@ -60,12 +62,30 @@
     };
     
     Pixelator.prototype.getAverageColor = function (section) {
-        var indices = this.pixelCollection.getIndicesInRect(section.x, section.y, section.width, section.height),
-            i = indices.length;
+        var pixels = this.pixelCollection,
+            indices = pixels.getIndicesInRect(section.x, section.y, section.width, section.height),
+            
+            sumColor = {r: 0, g: 0, b: 0, a: 0},
+            avgColor = {},
+            
+            len = indices.length,
+            i = len;
         
         while (i--) {
+            var pixel = pixels[indices[i]];
             
+            sumColor.r += pixel.r;
+            sumColor.g += pixel.g;
+            sumColor.b += pixel.b;
+            sumColor.a += pixel.a;
         }
+        
+        avgColor.r = sumColor.r / len;
+        avgColor.g = sumColor.g / len;
+        avgColor.b = sumColor.b / len;
+        avgColor.a = sumColor.a / len;
+        
+        return avgColor;
     };
     
     Pixelator.prototype.filters_ = [];
