@@ -59,7 +59,18 @@
         return sections;
     };
     
+    Pixelator.prototype.getAverageColor = function (section) {
+        var indices = this.pixelCollection.getIndicesInRect(section.x, section.y, section.width, section.height),
+            i = indices.length;
+        
+        while (i--) {
+            
+        }
+    };
+    
     Pixelator.prototype.filters_ = [];
+    
+    /** RGBAPixelCollection class. **/
     
     function RGBAPixelCollection (imageData) {
         if (!validateProps(imageData, Object, 'width', 'number', 'height', 'number')) {
@@ -200,6 +211,33 @@
     };
     */
     
+    /** RGBAColor class. **/
+    
+    function RGBAColor(red, green, blue, alpha) {
+        this.r = red & 255;
+        this.g = green & 255;
+        this.b = blue &  255;
+        this.a = alpha & 255;
+    }
+    
+    RGBA.prototype = {
+        r: 0,
+        g: 0,
+        b: 0,
+        a: 255
+    };
+    
+    /** Section class. **/
+    
+    function Section(x, y, w, h) {
+        this.x = x;
+        this.y = y;
+        this.width = w;
+        this.height = h;
+    }
+    
+    /** Miscellaneous utilities. **/
+    
     function validateProps(obj, constructor) {
         if (!(obj instanceof Object) || typeof constructor !== 'function' || !(obj instanceof constructor)) {
             return false;
@@ -242,20 +280,6 @@
             }
         } else return true;
     }
-    
-    function RGBAColor(red, green, blue, alpha) {
-        this.r = red & 255;
-        this.g = green & 255;
-        this.b = blue &  255;
-        this.a = alpha & 255;
-    }
-    
-    RGBA.prototype = {
-        r: 0,
-        g: 0,
-        b: 0,
-        a: 255
-    };
     
     window['Pixelator'] = Pixelator;
 })();
