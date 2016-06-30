@@ -42,7 +42,7 @@
             while (x >= 0) {
                 sections.push(new Section(x, y, sectionWidth, height));
                 
-                x -= sectioWidth;
+                x -= sectionWidth;
             }
         }
         
