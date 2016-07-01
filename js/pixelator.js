@@ -70,28 +70,25 @@
     };
     
     Pixelator.prototype.getAverageColor = function (section) {
-        var pixels = this.pixelCollection,
-            data = this.ctx_.getImageData(section.x, section.y, section.width, section.height),
+        var data = this.ctx_.getImageData(section.x, section.y, section.width, section.height),
             
             sumColor = {r: 0, g: 0, b: 0, a: 0},
             avgColor = {},
             
-            len = data.length,
-            i = len;//needs serious fixing
+            numOfPixels = data.length / 4,
+            i = 0;//needs serious fixing
         
-        while (i) {
-            var pixel = pixels[indices[i]];
-            
-            sumColor.r += pixel.r;
-            sumColor.g += pixel.g;
-            sumColor.b += pixel.b;
-            sumColor.a += pixel.a;
+        while (i < numOfPixels) {
+            sumColor.r += data[i++];
+            sumColor.g += data[i++];
+            sumColor.b += data[i++];
+            sumColor.a += data[i++];
         }
         
-        avgColor.r = sumColor.r / len;
-        avgColor.g = sumColor.g / len;
-        avgColor.b = sumColor.b / len;
-        avgColor.a = sumColor.a / len;
+        avgColor.r = sumColor.r / numOfPixels;
+        avgColor.g = sumColor.g / numOfPixels;
+        avgColor.b = sumColor.b / numOfPixels;
+        avgColor.a = sumColor.a / numOfPixels;
         
         return avgColor;
     };
