@@ -1,6 +1,6 @@
 (function () {
     function Pixelator(imageData) {
-        if (!(imageData instanceof Object && typeof imageData.width === 'number' && typeof imageData.height === 'number' && (imageData.data) instanceof Uint8ClampedArray)) {
+        if (!validateProps(imageData, Object, 'width', 'number', 'height', 'number', 'data', Uint8ClampedArray)) {
             throw new TypeError('The first argument passed into the Pixelator constructor was not a valid ImageData object.');
         }
         
@@ -11,97 +11,89 @@
     }
     
     Pixelator.prototype.pixelate = function (sectionWidth, sectionHeight) {
-        var allSectionInfo = this.getAllSectionInfo(sectionWidth, sectionHeight),
-            filters = this.filters_,
-            pixelatedImage = this.pixelCollection.clone();
+        var sections = this.getAllSections(sectionWidth, sectionHeight),
+            canvas = document.createElement('canvas'),
+            ctx = canvas.getContext('2d'),
+            i = sections.length;
         
-        for (var i = 0; i < allSectionInfo.length; i++) {
-            var sectionInfo = allSectionInfo[i],
-                
-                x = sectionInfo.x,
-                y = sectionInfo.y,
-                w = sectionInfo.width,
-                h = sectionInfo.height,
-                
-                sectionIndices = this.pixelCollection.getIndicesInRect(x, y, w, h),
-                
-                numberOfPixels = sectionIndices.length,
-                
-                sumColor = {r: 0, g: 0, b: 0, a: 0},
-                averageColor = {};
+        while (i--) {
+            var section = sections[i],
+                average = Pixelator.getAverageColor(section);
             
-            for (var j = 0; j < numberOfPixels; j++) {
-                var pixel = sectionIndices[j];
-                
-                sumColor.r += pixel.r;
-                sumColor.g += pixel.g;
-                sumColor.b += pixel.b;
-                sumColor.a += pixel.a;
-            }
-            
-            averageColor.r = Math.round(sumColor.r / numberOfPixels);
-            averageColor.g = Math.round(sumColor.g / numberOfPixels);
-            averageColor.b = Math.round(sumColor.b / numberOfPixels);
-            averageColor.a = Math.round(sumColor.a / numberOfPixels);
-            
-            for (var f = 0; f < filter.length; f++) {
-                filters[f].applyFilter(sumColor, this);
-            }
-            
-            for (j = 0; j < sectionIndices.length; j++) {
-                pixelatedImage.setPixelByIndex(sectionIndices[j], averageColor);
-            }
+            ctx.fillStyle = 'rgba(' + average.r + ',' + average.g + ',' + average.b + ',' average.a + ')';
+            ctx.fillRect(section.x, section.y, section.width, section.height);
         }
         
-        return pixelatedImage;
+        return ctx;
     };
     
-    Pixelator.prototype.getAllSectionInfo = function (sectionWidth, sectionHeight) {
-        var allSectionInfo = [],
-        
-            x = 0,
-            y = 0,
+    Pixelator.prototype.getAllSections = function (sectionWidth, sectionHeight) {
+        var sections = [],
             
-            endX = this.width - 1,
-            endY = this.height - 1;
-        
-        while (endY - y >= sectionHeight) {
-            x = 0;
+            rightEdgeSectionWidth = this.width % sectionWidth,
+            bottomEdgeSectionHeight = this.height % sectionHeight,
             
-            while (endX - x >= sectionWidth) {
-                allSectionInfo.push({x: x, y: y, width: sectionWidth, height: sectionHeight});
+            rightEdgeSectionX = this.width - rightEdgeSectionWidth,
+            bottomEdgeSectionY = this.height - bottomEdgeSectionHeight;
+        
+        function addAllSectionsForRow(y, height) {
+            sections.push(new Section(rightEdgeSectionX, y, rightEdgeSectionWidth, height));
+            
+            var x = rightEdgeSectionX - sectionWidth;
+            
+            while (x >= 0) {
+                sections.push(new Section(x, y, sectionWidth, height));
                 
-                x += sectionWidth;
-            }
-            
-            if (x < endX) {
-                allSectionInfo.push({x: x, y: y, width: endX - x, height: sectionHeight})
-            }
-            
-            y += sectionHeight;
-        }
-        
-        if (y < endY) {
-            x = 0;
-            
-            while (endX - x >= sectionWidth) {
-                allSectionInfo.push({x: x, y: y, width: sectionWidth, height: endY - y});
-                
-                x += sectionWidth;
-            }
-            
-            if (x < endX) {
-                allSectionInfo.push({x: x, y: y, width: endX - x, height: endY - y});
+                x -= sectionWidth;
             }
         }
         
-        return allSectionInfo;
+        addAllSectionsForRow(bottomEdgeSectionY, bottomEdgeSectionHeight);
+        
+        var y = bottomEdgeSectionY - sectionHeight;
+        
+        while (y >= 0) {
+            addAllSectionsForRow(y, sectionHeight);
+            
+            y -= sectionHeight;
+        }
+        
+        return sections;
+    };
+    
+    Pixelator.prototype.getAverageColor = function (section) {
+        var pixels = this.pixelCollection,
+            indices = pixels.getIndicesInRect(section.x, section.y, section.width, section.height),
+            
+            sumColor = {r: 0, g: 0, b: 0, a: 0},
+            avgColor = {},
+            
+            len = indices.length,
+            i = len;
+        
+        while (i--) {
+            var pixel = pixels[indices[i]];
+            
+            sumColor.r += pixel.r;
+            sumColor.g += pixel.g;
+            sumColor.b += pixel.b;
+            sumColor.a += pixel.a;
+        }
+        
+        avgColor.r = sumColor.r / len;
+        avgColor.g = sumColor.g / len;
+        avgColor.b = sumColor.b / len;
+        avgColor.a = sumColor.a / len;
+        
+        return avgColor;
     };
     
     Pixelator.prototype.filters_ = [];
     
+    /** RGBAPixelCollection class. **/
+    
     function RGBAPixelCollection (imageData) {
-        if (!(imageData instanceof Object && typeof imageData.width === 'number' && typeof imageData.height === 'number')) {
+        if (!validateProps(imageData, Object, 'width', 'number', 'height', 'number')) {
             throw new TypeError('The first argument passed into the RGBAPixelCollection constructor was not a valid ImageData object.');
         }
         
@@ -115,23 +107,13 @@
             this.raw = imageData;
             
             for (var i = 0; i < data.length; i+= 4) {
-                this.pixels.push({
-                    r: data[i],
-                    g: data[i + 1],
-                    b: data[i + 2],
-                    a: data[i + 3]
-                });
+                this.pixels.push(new RGBAColor(data[i], data[i + 1], data[i + 2], data[i + 3]));
             }
         } else {
             var size = this.width * this.height;
             
             for (var i = 0; i < size; i++) {
-                this.pixels.push({
-                    r: 0,
-                    g: 0,
-                    b: 0,
-                    a: 255
-                });
+                this.pixels.push(new RGBAColor(0, 0, 0, 255));
             }
             
             this.raw = this.toSimpleImageData();
@@ -153,6 +135,7 @@
         return indices;
     };
     
+    /*
     RGBAPixelCollection.prototype.setPixelByIndex = function (index, color) {
         if (!(index in this.pixels)) {
             throw new RangeError('The index argument (' + JSON.stringify(index) + ') is not a valid index.');
@@ -171,11 +154,15 @@
         
         return pixel;
     };
+    */
     
+    /*
     RGBAPixelCollection.prototype.clone = function () {
         return new RGBAPixelCollection(this.raw);
     };
+    */
     
+    /*
     RGBAPixelCollection.prototype.toSimpleImageData = function () {
         var imageData = {width: this.width, height: this.height},
             pixels = this.pixels,
@@ -194,7 +181,9 @@
         
         return imageData;
     };
+    */
     
+    /*
     RGBAPixelCollection.prototype.toImage = function () {
         var canvas = document.createElement('canvas'),
             ctx = canvas.getContext('2d'),
@@ -244,6 +233,77 @@
         
         return canvas.toDataURL();
     };
+    */
+    
+    /** RGBAColor class. **/
+    
+    function RGBAColor(red, green, blue, alpha) {
+        this.r = red & 255;
+        this.g = green & 255;
+        this.b = blue &  255;
+        this.a = alpha & 255;
+    }
+    
+    RGBA.prototype = {
+        r: 0,
+        g: 0,
+        b: 0,
+        a: 255
+    };
+    
+    /** Section class. **/
+    
+    function Section(x, y, w, h) {
+        this.x = x;
+        this.y = y;
+        this.width = w;
+        this.height = h;
+    }
+    
+    /** Miscellaneous utilities. **/
+    
+    function validateProps(obj, constructor) {
+        if (!(obj instanceof Object) || typeof constructor !== 'function' || !(obj instanceof constructor)) {
+            return false;
+        }
+        
+        var numOfArgs = arguments.length;
+        
+        for (var i = 2; i < numOfArgs; i += 2) {
+            var prop = obj[arguments[i]],
+                propType = arguments[i + 1],
+                propTypeType = typeof propType;
+            
+            if (
+                (propTypeType === 'function' && !(prop instanceof propType)) ||
+                (propTypeType === 'string' && typeof prop !== propType) ||
+                (propTypeType !== 'function' && propTypeType !== 'string')
+            ) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    function multiValueTypeCheck(type) {
+        var typeType = typeof type,
+            i = arguments.length;
+        
+        if (typeType === 'function') {
+            while (--i) { // Skip first argument (which is the type argument).
+                if (!(arguments[i] instanceof type)) {
+                    return false;
+                }
+            }
+        } else if (typeType === 'string') {
+            while (--i) {
+                if (typeof arguments[i] !== type) {
+                    return false;
+                }
+            }
+        } else return true;
+    }
     
     window['Pixelator'] = Pixelator;
 })();
