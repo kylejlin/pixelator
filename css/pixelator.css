@@ -27,3 +27,9 @@ html, body {
   background-image: -o-linear-gradient(top, #ffcc00, #ffe066);
   background-image: linear-gradient(to bottom, #ffcc00, #ffe066);
 }
+
+.paragraph-title {
+  font-weight: bold;
+}
+
+
