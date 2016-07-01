@@ -244,7 +244,7 @@
         this.a = alpha & 255;
     }
     
-    RGBA.prototype = {
+    RGBAColor.prototype = {
         r: 0,
         g: 0,
         b: 0,
