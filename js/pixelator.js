@@ -20,7 +20,7 @@
             var section = sections[i],
                 average = Pixelator.getAverageColor(section);
             
-            ctx.fillStyle = 'rgba(' + average.r + ',' + average.g + ',' + average.b + ',' average.a + ')';
+            ctx.fillStyle = 'rgba(' + average.r + ',' + average.g + ',' + average.b + ',' + average.a + ')';
             ctx.fillRect(section.x, section.y, section.width, section.height);
         }
         
