@@ -1,4 +1,6 @@
 (function () {
+    /** Pixelator class. **/
+    
     function Pixelator(imageData) {
         if (!validateProps(imageData, Object, 'width', 'number', 'height', 'number', 'data', Uint8ClampedArray)) {
             throw new TypeError('The first argument passed into the Pixelator constructor was not a valid ImageData object.');
@@ -6,8 +8,14 @@
         
         this.width = imageData.width;
         this.height = imageData.height;
-        this.pixelCollection = new RGBAPixelCollection(imageData);
-        this.rawImageData = imageData;
+        this.data = imageData.data;
+        
+        this.canvas_ = document.createElement('canvas');
+        this.canvas_.width = this.width;
+        this.canvas_.height = this.height;
+        
+        this.ctx_ = this.canvas_.getContext('2d');
+        this.ctx_.putImageData(imageData, 0, 0);
     }
     
     Pixelator.prototype.pixelate = function (sectionWidth, sectionHeight) {
@@ -62,194 +70,30 @@
     };
     
     Pixelator.prototype.getAverageColor = function (section) {
-        var pixels = this.pixelCollection,
-            indices = pixels.getIndicesInRect(section.x, section.y, section.width, section.height),
+        var data = this.ctx_.getImageData(section.x, section.y, section.width, section.height),
             
             sumColor = {r: 0, g: 0, b: 0, a: 0},
             avgColor = {},
             
-            len = indices.length,
-            i = len;
+            numOfPixels = data.length / 4,
+            i = 0;//needs serious fixing
         
-        while (i--) {
-            var pixel = pixels[indices[i]];
-            
-            sumColor.r += pixel.r;
-            sumColor.g += pixel.g;
-            sumColor.b += pixel.b;
-            sumColor.a += pixel.a;
+        while (i < numOfPixels) {
+            sumColor.r += data[i++];
+            sumColor.g += data[i++];
+            sumColor.b += data[i++];
+            sumColor.a += data[i++];
         }
         
-        avgColor.r = sumColor.r / len;
-        avgColor.g = sumColor.g / len;
-        avgColor.b = sumColor.b / len;
-        avgColor.a = sumColor.a / len;
+        avgColor.r = sumColor.r / numOfPixels;
+        avgColor.g = sumColor.g / numOfPixels;
+        avgColor.b = sumColor.b / numOfPixels;
+        avgColor.a = sumColor.a / numOfPixels;
         
         return avgColor;
     };
     
     Pixelator.prototype.filters_ = [];
-    
-    /** RGBAPixelCollection class. **/
-    
-    function RGBAPixelCollection (imageData) {
-        if (!validateProps(imageData, Object, 'width', 'number', 'height', 'number')) {
-            throw new TypeError('The first argument passed into the RGBAPixelCollection constructor was not a valid ImageData object.');
-        }
-        
-        this.width = imageData.width;
-        this.height = imageData.height;
-        this.pixels = [];
-        
-        var data = imageData.data;
-        
-        if (data instanceof Uint8ClampedArray) {
-            this.raw = imageData;
-            
-            for (var i = 0; i < data.length; i+= 4) {
-                this.pixels.push(new RGBAColor(data[i], data[i + 1], data[i + 2], data[i + 3]));
-            }
-        } else {
-            var size = this.width * this.height;
-            
-            for (var i = 0; i < size; i++) {
-                this.pixels.push(new RGBAColor(0, 0, 0, 255));
-            }
-            
-            this.raw = this.toSimpleImageData();
-        }
-    }
-    
-    RGBAPixelCollection.prototype.getIndicesInRect = function (startX, startY, rectWidth, rectHeight) {
-        var indices = [],
-            endX = startX + rectWidth - 1,
-            endY = startY + rectHeight - 1,
-            collectionWidth = this.width;
-        
-        for (var row = startY; row <= endY; row++) {
-            for (var rowCell = startX; rowCell = endX; rowCell++) {
-                indices.push(row * collectionWidth + rowCell);
-            }
-        }
-        
-        return indices;
-    };
-    
-    /*
-    RGBAPixelCollection.prototype.setPixelByIndex = function (index, color) {
-        if (!(index in this.pixels)) {
-            throw new RangeError('The index argument (' + JSON.stringify(index) + ') is not a valid index.');
-        }
-        
-        if (!(color instanceof Object && 'r' in color && 'g' in color && 'b' in color && 'a' in color)) {
-            throw new TypeError('The color argument (' + JSON.stringify(color) + ') is not a valid color.');
-        }
-        
-        var pixel = this.pixels[index];
-        
-        pixel.r = color.r;
-        pixel.g = color.g;
-        pixel.b = color.b;
-        pixel.a = color.a;
-        
-        return pixel;
-    };
-    */
-    
-    /*
-    RGBAPixelCollection.prototype.clone = function () {
-        return new RGBAPixelCollection(this.raw);
-    };
-    */
-    
-    /*
-    RGBAPixelCollection.prototype.toSimpleImageData = function () {
-        var imageData = {width: this.width, height: this.height},
-            pixels = this.pixels,
-            data = new Uint8ClampedArray(this.width * this.height);
-        
-        for (var i = 0; i < pixels.length; i+= 4) {
-            var currentPixel = pixels[i];
-            
-            data[i] = currentPixel.r;
-            data[i + 1] = currentPixel.g;
-            data[i + 2] = currentPixel.b;
-            data[i + 3] = currentPixel.a;
-        }
-        
-        imageData.data = data;
-        
-        return imageData;
-    };
-    */
-    
-    /*
-    RGBAPixelCollection.prototype.toImage = function () {
-        var canvas = document.createElement('canvas'),
-            ctx = canvas.getContext('2d'),
-            
-            image = document.createElement('img'),
-            
-            pixels = this.pixels,
-            size = pixels.length,
-            
-            width = this.width,
-            height = this.height;
-        
-        canvas.width = width;
-        canvas.height = height;
-        
-        for (var i = 0; i < size; i++) {
-            var pixel = pixels[i];
-            
-            ctx.fillStyle = 'rgba(' + pixel.r + ',' + pixel.g + ',' + pixel.b + ',' + pixel.a + ')';
-            ctx.fillRect(i % width, Math.floor(i / width), 1, 1);
-        }
-        
-        image.src = canvas.toDataURL();
-        
-        return image;
-    };
-    
-    RGBAPixelCollection.prototype.toDataURL = function () {
-        var canvas = document.createElement('canvas'),
-            ctx = canvas.getContext('2d'),
-            
-            pixels = this.pixels,
-            size = pixels.length,
-            
-            width = this.width,
-            height = this.height;
-        
-        canvas.width = width;
-        canvas.height = height;
-        
-        for (var i = 0; i < size; i++) {
-            var pixel = pixels[i];
-            
-            ctx.fillStyle = 'rgba(' + pixel.r + ',' + pixel.g + ',' + pixel.b + ',' + pixel.a + ')';
-            ctx.fillRect(i % width, Math.floor(i / width), 1, 1);
-        }
-        
-        return canvas.toDataURL();
-    };
-    */
-    
-    /** RGBAColor class. **/
-    
-    function RGBAColor(red, green, blue, alpha) {
-        this.r = red & 255;
-        this.g = green & 255;
-        this.b = blue &  255;
-        this.a = alpha & 255;
-    }
-    
-    RGBAColor.prototype = {
-        r: 0,
-        g: 0,
-        b: 0,
-        a: 255
-    };
     
     /** Section class. **/
     
