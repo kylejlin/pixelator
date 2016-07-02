@@ -41,7 +41,7 @@ var demo = (function () {
                 
                 pixelator = new Pixelator(ctx.getImageData(0, 0, width, height));
                 
-                afterImg.src = pixelator.pixelate((widthInput.value | 0) || 10, (heightInput.value | 0) || 10).canvas.toDataURL();
+                afterImg.src = pixelator.pixelate((widthInput.value | 0) || 10, (heightInput.value | 0) || 10).canvas.toDataURL('image/png', 1);
                 
                 show(outputContainer);
             });
