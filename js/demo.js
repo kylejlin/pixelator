@@ -68,6 +68,8 @@ var demo = (function () {
     }
     
     return {
-        error: error
+        error: error,
+        show: show,
+        hide: hide
     }; // Nothing to export so far.
 })();
