@@ -1,7 +1,7 @@
-(function () {
+(function() {
     /** Pixelator class. **/
     
-    function Pixelator(imageData) {
+    function Pixelator(imageData, opt_targetContainer, opt_delay) {
         if (!validateProps(imageData, Object, 'width', 'number', 'height', 'number', 'data', Uint8ClampedArray)) {
             throw new TypeError('The first argument passed into the Pixelator constructor was not a valid ImageData object.');
         }
@@ -16,26 +16,44 @@
         
         this.ctx_ = this.canvas_.getContext('2d');
         this.ctx_.putImageData(imageData, 0, 0);
+        
+        if (opt_targetContainer instanceof Element && (opt_delay |= 0) > 0) {
+            opt_targetContainer.appendChild(this.canvas);
+            
+            this.targetContainer = opt_targetContainer;
+            this.delay = opt_delay;
+        } else {
+            this.targetContainer = null;
+            this.delay = null;
+        }
     }
     
-    Pixelator.prototype.pixelate = function (sectionWidth, sectionHeight) {
+    Pixelator.prototype.pixelate = function(sectionWidth, sectionHeight) {
         var sections = this.getAllSections(sectionWidth, sectionHeight),
             canvas = document.createElement('canvas'),
             ctx = canvas.getContext('2d'),
+            delay = this.delay,
             i = sections.length;
         
-        while (i--) {
-            var section = sections[i],
-                average = this.getAverageColor(section);
-            
-            ctx.fillStyle = 'rgba(' + average.r + ',' + average.g + ',' + average.b + ',' + average.a / 255 + ')';
-            ctx.fillRect(section.x, section.y, section.width, section.height);
-        }
+        var drawNewestSection = (function() {
+            if (i--) {
+                var section = sections[i],
+                    average = this.getAverageColor(section);
+                
+                ctx.fillStyle = 'rgba(' + average.r + ',' + average.g + ',' + average.b + ',' + average.a / 255 + ')';
+                ctx.fillRect(section.x, section.y, section.width, section.height);
+                
+                setTimeout(drawNewestSection, delay);
+            }
+        }).bind(this);
+        
+        if (i)
+            setTimeout(drawNewestSection, delay);
         
         return ctx;
     };
     
-    Pixelator.prototype.getAllSections = function (sectionWidth, sectionHeight) {
+    Pixelator.prototype.getAllSections = function(sectionWidth, sectionHeight) {
         var sections = [],
             
             rightEdgeSectionWidth = this.width % sectionWidth,
@@ -69,7 +87,7 @@
         return sections;
     };
     
-    Pixelator.prototype.getAverageColor = function (section) {
+    Pixelator.prototype.getAverageColor = function(section) {
         var data = this.ctx_.getImageData(section.x, section.y, section.width, section.height).data,
             
             sumColor = {r: 0, g: 0, b: 0, a: 0},
