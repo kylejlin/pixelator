@@ -28,7 +28,7 @@
             var section = sections[i],
                 average = this.getAverageColor(section);
             
-            ctx.fillStyle = 'rgba(' + average.r + ',' + average.g + ',' + average.b + ',' + average.a + ')';
+            ctx.fillStyle = 'rgba(' + average.r + ',' + average.g + ',' + average.b + ',' + average.a / 255 + ')';
             ctx.fillRect(section.x, section.y, section.width, section.height);
         }
         
