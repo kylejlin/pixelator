@@ -18,7 +18,7 @@
         this.ctx_.putImageData(imageData, 0, 0);
         
         if (opt_targetContainer instanceof Element && (opt_delay |= 0) > 0) {
-            opt_targetContainer.appendChild(this.canvas);
+            opt_targetContainer.appendChild(this.canvas_);
             
             this.targetContainer = opt_targetContainer;
             this.delay = opt_delay;
