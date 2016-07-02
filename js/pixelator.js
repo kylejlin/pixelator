@@ -75,10 +75,11 @@
             sumColor = {r: 0, g: 0, b: 0, a: 0},
             avgColor = {},
             
-            numOfPixels = data.length / 4,
+            len = data.length,
+            numOfPixels = len / 4,
             i = 0;//needs serious fixing
         
-        while (i < numOfPixels) {
+        while (i < len) {
             sumColor.r += data[i++];
             sumColor.g += data[i++];
             sumColor.b += data[i++];
