@@ -24,6 +24,9 @@
             ctx = canvas.getContext('2d'),
             i = sections.length;
         
+        canvas.width = this.width;
+        canvas.height = this.height;
+        
         while (i--) {
             var section = sections[i],
                 average = this.getAverageColor(section);
