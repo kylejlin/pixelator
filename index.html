@@ -14,25 +14,50 @@
   
   <h1>Pixelator</h1>
   
+  <h2>An online tool for pixelating your images.</h2>
+  
   <p>
-    Upload an image to pixelate it!
+    <span class="paragraph-title">Step 1: </span>
+    Upload an image.
   </p>
   <input type="file" id="upload"/>
   
   <p>
-    Before pixelation:
+    <span class="paragraph-title">Step 2: </span>
+    Choose the size of the pixels in the pixelated image.
   </p>
-  <img id="before"/>
+  <div>
+    Width:
+    <input type="text" id="section-width" value="10"/>px
+    Height:
+    <input type="text" id="section-height" value="10"/>px
+  </div>
   
   <p>
-    After pixelation:
+    <span class="paragraph-title">Step 3: </span>
+    <p id="pixelate-btn"><span style="color: #ff6600">Placeholder for the button we don't have yet due to lack of good artwork.</span></p>
   </p>
-  <img id="after"/>
   
-  <p>
-    Click below to download the pixelated image.
-  </p>
-  <a id="download"><img src="images/download-btn.png"/></a>
+  <div id="output-container" style="display: none">
+    <p>
+      Before pixelation:
+    </p>
+    <img id="before"/>
+    
+    <p>
+      After pixelation:
+    </p>
+    <img id="after"/>
+    
+    <p>
+      Click below to download the pixelated image.
+    </p>
+    <a id="download"><img src="images/download-btn.png"/></a>
+  </div>
+  
+  <div id="error-container" style="display: none">
+    
+  </div>
   
   <script src="js/pixelator.js"></script>
   <script src="js/demo.js"></script>
