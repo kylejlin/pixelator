@@ -70,7 +70,7 @@
     };
     
     Pixelator.prototype.getAverageColor = function (section) {
-        var data = this.ctx_.getImageData(section.x, section.y, section.width, section.height),
+        var data = this.ctx_.getImageData(section.x, section.y, section.width, section.height).data,
             
             sumColor = {r: 0, g: 0, b: 0, a: 0},
             avgColor = {},
