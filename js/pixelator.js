@@ -18,13 +18,13 @@
         this.ctx_.putImageData(imageData, 0, 0);
         
         if (opt_targetContainer instanceof Element && (opt_delay |= 0) > 0) {
-            opt_targetContainer.appendChild(this.canvas);
-            
             this.targetContainer = opt_targetContainer;
             this.delay = opt_delay;
+            this.isLive = true;
         } else {
             this.targetContainer = null;
             this.delay = null;
+            this.isLive = false;
         }
     }
     
@@ -32,8 +32,15 @@
         var sections = this.getAllSections(sectionWidth, sectionHeight),
             canvas = document.createElement('canvas'),
             ctx = canvas.getContext('2d'),
-            delay = this.delay,
+            delay = this.delay | 0,
             i = sections.length;
+        
+        canvas.width = this.width;
+        canvas.height = this.height;
+        
+        if (this.isLive) {
+            this.targetContainer.appendChild(canvas);
+        }
         
         var drawNewestSection = (function() {
             if (i--) {

@@ -39,9 +39,10 @@ var demo = (function () {
                 
                 ctx.drawImage(beforeImg, 0, 0, width, height);
                 
-                pixelator = new Pixelator(ctx.getImageData(0, 0, width, height));
+                pixelator = new Pixelator(ctx.getImageData(0, 0, width, height), outputContainer, 100);
                 
-                afterImg.src = pixelator.pixelate((widthInput.value | 0) || 10, (heightInput.value | 0) || 10).canvas.toDataURL('image/png', 1);
+                //afterImg.src = pixelator.pixelate((widthInput.value | 0) || 10, (heightInput.value | 0) || 10).canvas.toDataURL('image/png', 1);
+                pixelator.pixelate((widthInput.value | 0) || 10, (heightInput.value | 0) || 10);
                 
                 show(outputContainer);
             });
