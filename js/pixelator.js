@@ -41,8 +41,8 @@
     Pixelator.prototype.getAllSections = function (sectionWidth, sectionHeight) {
         var sections = [],
             
-            rightEdgeSectionWidth = this.width % sectionWidth,
-            bottomEdgeSectionHeight = this.height % sectionHeight,
+            rightEdgeSectionWidth = (this.width % sectionWidth) || sectionWidth,
+            bottomEdgeSectionHeight = (this.height % sectionHeight) || sectionHeight,
             
             rightEdgeSectionX = this.width - rightEdgeSectionWidth,
             bottomEdgeSectionY = this.height - bottomEdgeSectionHeight;
@@ -132,25 +132,6 @@
         }
         
         return true;
-    }
-    
-    function multiValueTypeCheck(type) {
-        var typeType = typeof type,
-            i = arguments.length;
-        
-        if (typeType === 'function') {
-            while (--i) { // Skip first argument (which is the type argument).
-                if (!(arguments[i] instanceof type)) {
-                    return false;
-                }
-            }
-        } else if (typeType === 'string') {
-            while (--i) {
-                if (typeof arguments[i] !== type) {
-                    return false;
-                }
-            }
-        } else return true;
     }
     
     window['Pixelator'] = Pixelator;
