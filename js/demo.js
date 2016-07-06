@@ -1,4 +1,4 @@
-var demo = (function () {
+var demo = (function() {
     var fileInput = document.getElementById('upload'),
         widthInput = document.getElementById('section-width'),
         heightInput = document.getElementById('section-height'),
