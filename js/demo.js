@@ -49,7 +49,7 @@ var demo = (function() {
                 
                 show(outputContainer);
                 
-                pixelations.push(new Pixelation(pixelator, dataURL, afterImgURL));
+                pixelations.push(new Pixelation(pixelator, dataURL, afterImgDataURL));
             });
             
             reader.readAsDataURL(file);
