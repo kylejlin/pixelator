@@ -9,7 +9,9 @@ var demo = (function () {
             afterImg = document.getElementById('after'),
             downloadLink = document.getElementById('download'),
         
-        errorContainer = document.getElementById('error-container');
+        errorContainer = document.getElementById('error-container'),
+        
+        pixelations = [];
     
     pixelateBtn.addEventListener('click', function () {
         var file = fileInput.files[0];
@@ -23,6 +25,7 @@ var demo = (function () {
             
             reader.addEventListener('load', function () {
                 var dataURL = this.result,
+                    afterImgDataURL,
                 
                     width,
                     height,
@@ -41,9 +44,12 @@ var demo = (function () {
                 
                 pixelator = new Pixelator(ctx.getImageData(0, 0, width, height));
                 
-                afterImg.src = pixelator.pixelate((widthInput.value | 0) || 10, (heightInput.value | 0) || 10).canvas.toDataURL('image/png', 1);
+                afterImgDataURL = pixelator.pixelate((widthInput.value | 0) || 10, (heightInput.value | 0) || 10).canvas.toDataURL('image/png', 1);
+                afterImg.src = afterImgDataURL;
                 
                 show(outputContainer);
+                
+                pixelations.push(new Pixelation(pixelator, dataURL, afterImgURL));
             });
             
             reader.readAsDataURL(file);
@@ -67,9 +73,34 @@ var demo = (function () {
         elem.style.display = 'none';
     }
     
+    function Pixelation(pixelator, beforeURL, afterURL) {
+        this.pixelator = pixelator;
+        this.beforeURL = beforeURL;
+        this.afterURL = afterURL;
+        this.id = Pixelation.getId();
+    }
+    
+    Pixelation.getId = (function() {
+        var id = 0;
+        
+        return function() {
+            return id++;
+        }
+    })();
+    
     return {
         error: error,
         show: show,
-        hide: hide
-    }; // Nothing to export so far.
+        hide: hide,
+        
+        fileInput: fileInput,
+        widthInput: widthInput,
+        heightInput: heightInput,
+        
+        beforeImage: beforeImg,
+        afterImage: afterImg,
+        downloadLink: downloadLink,
+        
+        pixelations: pixelations
+    }; // For debug purposes.
 })();
