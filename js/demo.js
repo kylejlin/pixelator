@@ -47,7 +47,7 @@ var demo = (function() {
                 afterImgDataURL = pixelator.pixelate((widthInput.value | 0) || 10, (heightInput.value | 0) || 10).canvas.toDataURL('image/png', 1);
                 afterImg.src = afterImgDataURL;
                 
-                downloadLink.src = afterImgDataURL;
+                downloadLink.href = afterImgDataURL;
                 downloadLink.download = '(pixelated) ' + file.name;
                 
                 show(outputContainer);
