@@ -9,7 +9,7 @@ html, body {
 }
 
 #header-background {
-  position: fixed;
+  position: absolute;
   top: 0px;
   left: 0;
   
@@ -48,6 +48,10 @@ html, body {
 
 #headers {
   padding-bottom: 5%;
+}
+
+.btn {
+  cursor: pointer;
 }
 
 .paragraph-title {
