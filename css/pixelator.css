@@ -27,7 +27,7 @@ html, body {
 
 #background {
   position: fixed;
-  top: 120px;
+  top: 0px;
   left: 0;
   
   z-index: -101;
