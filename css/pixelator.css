@@ -10,7 +10,7 @@ html, body {
 
 #background {
   position: fixed;
-  top: 60px;
+  top: 120px;
   left: 0;
   
   z-index: -100;
