@@ -29,6 +29,10 @@ html, body {
   background-image: linear-gradient(to bottom, #ffcc00, #ffe066);
 }
 
+#headers {
+  padding-bottom: 5%;
+}
+
 .paragraph-title {
   font-weight: bold;
 }
