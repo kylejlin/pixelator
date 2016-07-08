@@ -1,5 +1,5 @@
 html, body {
-  padding: 0;
+  padding: 5%;
   border: 0;
   margin: 0;
   
@@ -32,4 +32,6 @@ html, body {
   font-weight: bold;
 }
 
-
+/*h1, p, img, a {
+  padding-left: 5%;
+}*/
