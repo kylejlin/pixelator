@@ -57,3 +57,8 @@ html, body {
 .paragraph-title {
   font-weight: bold;
 }
+
+.pseudo-p {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
