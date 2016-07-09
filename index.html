@@ -18,36 +18,46 @@
     <h4>An online tool for pixelating your images.</h4>
   </div>
   
-  <p>
-    <span class="paragraph-title">Step 1: </span>
-    Upload an image.
-  </p>
-  <input type="file" id="upload"/>
-  
-  <p>
-    <span class="paragraph-title">Step 2: </span>
-    Choose the size of the pixels in the pixelated image.
-  </p>
   <div>
-    Width:
-    <input type="text" id="section-width" value="10"/>px
-    Height:
-    <input type="text" id="section-height" value="10"/>px
+    <div class="pseudo-p">
+      <span class="paragraph-title">Step 1: </span>
+      Upload an image.
+    </div>
+    <input type="file" id="upload"/>
   </div>
   
-  <p>
-    <span class="paragraph-title">Step 3: </span>
-    Choose the portion of the image to pixelate, or select all of it.
-    <br/>
+  <div>
+    <div class="pseudo-p">
+      <span class="paragraph-title">Step 2: </span>
+      Choose the size of the pixels in the pixelated image.
+    </div>
+    
+    <div>
+      Width:
+      <input type="text" id="section-width" value="10"/>px
+      Height:
+      <input type="text" id="section-height" value="10"/>px
+    </div>
+  </div>
+  
+  
+  <div>
+    <div class="pseudo-p">
+      <span class="paragraph-title">Step 3: </span>
+      Choose the portion of the image to pixelate, or select all of it.
+    </div>
+    
     <input type="checkbox" id="select-all" checked="true"/> Select all
     
     <canvas id="select-portion" style="display:none;"></canvas>
-  </p>
+  </div>
   
-  <p>
-    <span class="paragraph-title" style="display:block;padding-bottom:8px;">Step 4: </span>
-    <img src="images/pixelate-btn.png" id="pixelate-btn" class="btn"/>
-  </p>
+  <div>
+    <div class="pseudo-p">
+      <span class="paragraph-title" style="display:block;padding-bottom:8px;">Step 4: </span>
+      <img src="images/pixelate-btn.png" id="pixelate-btn" class="btn"/>
+    </div>
+  </div>
   
   <div id="output-container" style="display: none">
     <p>
