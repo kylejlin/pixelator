@@ -1,5 +1,7 @@
 var demo = (function() {
     var fileInput = document.getElementById('upload'),
+        selectAll = document.getElementById('select-all'),
+        selectPortion = document.getElementById('select-portion'),
         widthInput = document.getElementById('section-width'),
         heightInput = document.getElementById('section-height'),
         pixelateBtn = document.getElementById('pixelate-btn'),
@@ -97,6 +99,8 @@ var demo = (function() {
         hide: hide,
         
         fileInput: fileInput,
+        selectAll: selectAll,
+        selectPortion: selectPortion,
         widthInput: widthInput,
         heightInput: heightInput,
         
