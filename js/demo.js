@@ -1,8 +1,11 @@
 var demo = (function() {
     var fileInput = document.getElementById('upload'),
+        
         selectAll = document.getElementById('select-all'),
-        selectPortion = document.getElementById('select-portion'),
-        clearSelection = document.getElementById('clear-selection')
+        selectPortionContainer = document.getElementById('select-portion'),
+            selectPortion = document.getElementById('select-portion'),
+            clearSelection = document.getElementById('clear-selection'),
+            
         widthInput = document.getElementById('section-width'),
         heightInput = document.getElementById('section-height'),
         pixelateBtn = document.getElementById('pixelate-btn'),
@@ -48,7 +51,7 @@ var demo = (function() {
                 
                 ctx.drawImage(beforeImg, 0, 0, width, height);
                 
-                if (selectAll.checked) {
+                if (selectAll.checked || selectedPortion.width <= 0 || selectedPortion.height <= 0) {
                     pixelator = new Pixelator(ctx.getImageData(0, 0, width, height));
                 } else {
                     pixelator = new Pixelator(ctx.getImageData(selectedPortion.x, selectedPortion.y, selectedPortion.width, selectedPortion.height));
@@ -109,11 +112,14 @@ var demo = (function() {
                 break;
             
             case 2:
+            default:
                 break;
         }
     });
     
-    select
+    clearSelection.addEventListener('click', function() {
+        selectedPortion = {x: 0, y: 0, width: 0, height: 0, status: 0};
+    });
     
     function error(msg) {
         show(errorContainer);
