@@ -27,13 +27,13 @@ var demo = (function() {
             
             reader.addEventListener('load', function () {
                 var dataURL = this.result,
+                    pixelatedPortionURL,
                     afterImgDataURL,
                 
                     width,
                     height,
                     
-                    pixelator,
-                    selectedPortion = {};
+                    pixelator;
                 
                 beforeImg.src = dataURL;
                 
@@ -46,17 +46,14 @@ var demo = (function() {
                 ctx.drawImage(beforeImg, 0, 0, width, height);
                 
                 if (selectAll.checked) {
-                    selectedPortion.x = 0;
-                    selectedPortion.y = 0;
-                    selectedPortion.w = width;
-                    selectedPortion.h = height;
+                    pixelator = new Pixelator(ctx.getImageData(0, 0, width, height));
                 } else {
-                    // Fix later.
+                    pixelator = new Pixelator(ctx.getImageData(selectedPortion.x, selectedPortion.y, selectedPortion.width, selectedPortion.height));
                 }
                 
-                pixelator = new Pixelator(ctx.getImageData(0, 0, width, height));
-                
-                afterImgDataURL = pixelator.pixelate((widthInput.value | 0) || 10, (heightInput.value | 0) || 10).canvas.toDataURL('image/png', 1);
+                // TODO: Fix file type and put pixelated portion on original image.
+                pixelatedPortionURL = pixelator.pixelate((widthInput.value | 0) || 10, (heightInput.value | 0) || 10).canvas.toDataURL('image/png', 1);
+                // Needs fixing here.
                 afterImg.src = afterImgDataURL;
                 
                 downloadLink.href = afterImgDataURL;
