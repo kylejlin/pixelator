@@ -85,11 +85,20 @@ var demo = (function() {
     });
     
     selectPortion.addEventListener('click', function(e) {
-        var status = selectedPortion.status;
+        var status = selectedPortion.status,
+            coords = getClickCoords(selectPortion, e),
+            x = coords.x,
+            y = coords.y;
         
         switch (status) {
             case 0:
-                // Fix here.
+                selectedPortion.x = x;
+                selectedPortion.y = y;
+                selectedPortion.status = 1;
+                break;
+            
+            case 1:
+                selectedPortion.width = 1 + Math.abs(selectedPortion.x - x);
         }
     });
     
@@ -114,6 +123,15 @@ var demo = (function() {
         while (i--) {
             arguments[i].style.display = 'none';
         }
+    }
+    
+    function getClickCoords(elem, event) {
+        var rect = elem.getBoundingClientRect();
+        
+        return {
+            x: event.x - rect.left,
+            y: event.y - rect.top
+        };
     }
     
     function Pixelation(pixelator, beforeURL, afterURL) {
