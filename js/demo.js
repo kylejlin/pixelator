@@ -32,7 +32,8 @@ var demo = (function() {
                     width,
                     height,
                     
-                    pixelator;
+                    pixelator,
+                    selectedPortion = {};
                 
                 beforeImg.src = dataURL;
                 
@@ -43,6 +44,15 @@ var demo = (function() {
                 canvas.height = height;
                 
                 ctx.drawImage(beforeImg, 0, 0, width, height);
+                
+                if (selectAll.checked) {
+                    selectedPortion.x = 0;
+                    selectedPortion.y = 0;
+                    selectedPortion.w = width;
+                    selectedPortion.h = height;
+                } else {
+                    // Fix later.
+                }
                 
                 pixelator = new Pixelator(ctx.getImageData(0, 0, width, height));
                 
