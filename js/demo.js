@@ -63,6 +63,14 @@ var demo = (function() {
         }
     });
     
+    selectAll.addEventListener('change', function() {
+        if (selectAll.checked) {
+            hide(selectPortion, clearSelection);
+        } else {
+            show(selectPortion, clearSelection);
+        }
+    });
+    
     function error(msg) {
         show(errorContainer);
         hide(outputContainer);
@@ -70,12 +78,20 @@ var demo = (function() {
         errorContainer.innerHTML = msg;
     }
     
-    function show(elem) {
-        elem.style.display = 'inherit';
+    function show() {
+        var i = arguments.length;
+        
+        while (i--) {
+            arguments[i].style.display = 'inherit';
+        }
     }
     
-    function hide(elem) {
-        elem.style.display = 'none';
+    function hide() {
+        var i = arguments.length;
+        
+        while (i--) {
+            arguments[i].style.display = 'none';
+        }
     }
     
     function Pixelation(pixelator, beforeURL, afterURL) {
