@@ -98,9 +98,22 @@ var demo = (function() {
                 break;
             
             case 1:
-                selectedPortion.width = 1 + Math.abs(selectedPortion.x - x);
+                if (x <= selectedPortion.x || y <= selectedPortion.y) {
+                    error('The second point must be lower and to the right of the first point.');
+                    break;
+                }
+                
+                selectedPortion.width = x - selectedPortion.x;
+                selectedPortion.height = y - selectedPortion.y;
+                selectedPortion.status = 2;
+                break;
+            
+            case 2:
+                break;
         }
     });
+    
+    select
     
     function error(msg) {
         show(errorContainer);
