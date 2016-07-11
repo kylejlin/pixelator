@@ -2,6 +2,7 @@ var demo = (function() {
     var fileInput = document.getElementById('upload'),
         selectAll = document.getElementById('select-all'),
         selectPortion = document.getElementById('select-portion'),
+        clearSelection = document.getElementById('clear-selection')
         widthInput = document.getElementById('section-width'),
         heightInput = document.getElementById('section-height'),
         pixelateBtn = document.getElementById('pixelate-btn'),
@@ -13,6 +14,7 @@ var demo = (function() {
         
         errorContainer = document.getElementById('error-container'),
         
+        selectedPortion = {x: 0, y: 0, width: 0, height: 0, status: 0},
         pixelations = [];
     
     pixelateBtn.addEventListener('click', function () {
@@ -28,6 +30,7 @@ var demo = (function() {
             reader.addEventListener('load', function () {
                 var dataURL = this.result,
                     pixelatedPortionURL,
+                    pixelatedPortionImage = document.createElement('img'),
                     afterImgDataURL,
                 
                     width,
@@ -53,7 +56,10 @@ var demo = (function() {
                 
                 // TODO: Fix file type and put pixelated portion on original image.
                 pixelatedPortionURL = pixelator.pixelate((widthInput.value | 0) || 10, (heightInput.value | 0) || 10).canvas.toDataURL('image/png', 1);
-                // Needs fixing here.
+                pixelatedPortionImage.src = pixelatedPortionURL;
+                
+                ctx.drawImage(pixelatedPortionImage, 0, 0, pixelatedPortionImage.width, pixelatedPortionImage.height);
+                afterImgDataURL = canvas.toDataURL('image/png', 1.0);
                 afterImg.src = afterImgDataURL;
                 
                 downloadLink.href = afterImgDataURL;
@@ -75,6 +81,15 @@ var demo = (function() {
             hide(selectPortion, clearSelection);
         } else {
             show(selectPortion, clearSelection);
+        }
+    });
+    
+    selectPortion.addEventListener('click', function(e) {
+        var status = selectedPortion.status;
+        
+        switch (status) {
+            case 0:
+                // Fix here.
         }
     });
     
