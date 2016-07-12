@@ -2,7 +2,7 @@ var demo = (function() {
     var fileInput = document.getElementById('upload'),
         
         selectAll = document.getElementById('select-all'),
-        selectPortionContainer = document.getElementById('select-portion'),
+        selectPortionContainer = document.getElementById('select-portion-container'),
             selectPortion = document.getElementById('select-portion'),
             clearSelection = document.getElementById('clear-selection'),
             
