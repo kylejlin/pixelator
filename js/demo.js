@@ -1,9 +1,11 @@
 var demo = (function() {
     var fileInput = document.getElementById('upload'),
+        currentImg = document.createElement('img'),
         
         selectAll = document.getElementById('select-all'),
         selectPortionContainer = document.getElementById('select-portion-container'),
             selectPortion = document.getElementById('select-portion'),
+            selectPortionCtx = selectPortion.getContext('2d'),
             clearSelection = document.getElementById('clear-selection'),
             
         widthInput = document.getElementById('section-width'),
@@ -17,10 +19,83 @@ var demo = (function() {
         
         errorContainer = document.getElementById('error-container'),
         
-        selectedPortion = {x: 0, y: 0, width: 0, height: 0, status: 0},
+        selectedPortion = {
+            x: 0,
+            y: 0,
+            status: 0,
+            SELECT_RECT_COLOR: '#FFFFFF',
+            SELECT_RECT_WIDTH: '2',
+            
+            updateCanvas: function() {
+                switch (this.status) {
+                    case 0:
+                        selectPortionCtx.drawImage(currentImg, 0, 0, img.width, img.height);
+                        break;
+                    
+                    case 1:
+                        selectPortionCtx.fillStyle = this.SELECT_RECT_COLOR;
+                        selectPortionCtx.fillRect(this.x, this.y, this.SELECT_RECT_WIDTH);
+                        break;
+                    
+                    case 2:
+                        selectPortionCtx.fillStyle = this.SELECT_RECT_COLOR;
+                        selectPortionCtx.lineWidth = this.SELECT_RECT_WIDTH;
+                        selectPortionCtx.beginPath();
+                        selectPortion.rect(this.x, this.y, this.width, this.height);
+                        selectPortion.stroke();
+                }
+            },
+            
+            reset: function(opt_updateCanvas) {
+                this.x = 0;
+                this.y = 0;
+                this.width = 0;
+                this.height = 0;
+                this.status = 0;
+                
+                if (opt_updateCanvas) {
+                    this.updateCanvas();
+                }
+            },
+            
+            clone: function() {
+                var clone = {
+                    x: this.x,
+                    y: this.y,
+                    width: this.width,
+                    height: this.height,
+                    status: this.status
+                };
+                
+                clone.updateCanvas = this.updateCanvas.bind(clone);
+                clone.reset = this.reset.bind(clone);
+                clone.clone = this.clone.bind(clone);
+                
+                return clone;
+            }
+        },
         pixelations = [];
     
-    pixelateBtn.addEventListener('click', function () {
+    fileInput.addEventListener('change', function() {
+        var file = fileInput.files[0],
+            reader = new FileReader();
+        
+        if (file instanceof File && /\.(jpe?g|png|gif)$/i.test(file.name)) {
+            reader.addEventListener('load', function() {
+                currentImg.src = this.result;
+                
+                selectedPortion.reset(true);
+            });
+            
+            reader.readAsDataURL(file);
+            
+            show(selectPortionContainer);
+        } else {
+            error('As of now, this tool only supports jpg, jpeg, png, and gif files.');
+        }
+    });
+    
+    pixelateBtn.addEventListener('click', function() {
         var file = fileInput.files[0];
         
         hide(errorContainer);
@@ -30,7 +105,7 @@ var demo = (function() {
                 canvas = document.createElement('canvas'),
                 ctx = canvas.getContext('2d');
             
-            reader.addEventListener('load', function () {
+            reader.addEventListener('load', function() {
                 var dataURL = this.result,
                     pixelatedPortionURL,
                     pixelatedPortionImage = document.createElement('img'),
@@ -51,7 +126,7 @@ var demo = (function() {
                 
                 ctx.drawImage(beforeImg, 0, 0, width, height);
                 
-                if (selectAll.checked || selectedPortion.width <= 0 || selectedPortion.height <= 0) {
+                if (selectAll.checked || selectedPortion.width <= 0 || selectedPortion.height <= 0 || selectedPortion.status !== 2) {
                     pixelator = new Pixelator(ctx.getImageData(0, 0, width, height));
                 } else {
                     pixelator = new Pixelator(ctx.getImageData(selectedPortion.x, selectedPortion.y, selectedPortion.width, selectedPortion.height));
@@ -98,6 +173,7 @@ var demo = (function() {
                 selectedPortion.x = x;
                 selectedPortion.y = y;
                 selectedPortion.status = 1;
+                selectedPortion.updateCanvas();
                 break;
             
             case 1:
@@ -109,16 +185,20 @@ var demo = (function() {
                 selectedPortion.width = x - selectedPortion.x;
                 selectedPortion.height = y - selectedPortion.y;
                 selectedPortion.status = 2;
+                selectedPortion.updateCanvas();
                 break;
             
-            case 2:
             default:
                 break;
         }
     });
     
     clearSelection.addEventListener('click', function() {
-        selectedPortion = {x: 0, y: 0, width: 0, height: 0, status: 0};
+        var userHasConfirmed = confirm('Are you sure you want to restart your selection?');
+        
+        if (userHasConfirmed) {
+            selectedPortion.reset(true);
+        }
     });
     
     function error(msg) {
