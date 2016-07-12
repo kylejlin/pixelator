@@ -164,27 +164,30 @@ var demo = (function() {
                     pixelator = new Pixelator(ctx.getImageData(selectedPortion.x, selectedPortion.y, selectedPortion.width, selectedPortion.height));
                 }
                 
-                var intervalId = startProgressBar(pixelator, 300);
-                
-                // TODO: Fix file type and put pixelated portion on original image.
-                pixelatedPortionURL = pixelator.pixelate((widthInput.value | 0) || 10, (heightInput.value | 0) || 10).canvas.toDataURL('image/png', 1);
-                pixelatedPortionImage.src = pixelatedPortionURL;
-                
-                if (useWholeImg) {
-                    ctx.drawImage(pixelatedPortionImage, 0, 0, width, height);
-                } else {
-                    ctx.drawImage(pixelatedPortionImage, selectedPortion.x, selectedPortion.y, pixelatedPortionImage.width, pixelatedPortionImage.height);
+                function finishPixelation() {
+                    pixelatedPortionURL = pixelator.pixelate((widthInput.value | 0) || 10, (heightInput.value | 0) || 10).canvas.toDataURL('image/png', 1);
+                    pixelatedPortionImage.src = pixelatedPortionURL;
+                    
+                    if (useWholeImg) {
+                        ctx.drawImage(pixelatedPortionImage, 0, 0, width, height);
+                    } else {
+                        ctx.drawImage(pixelatedPortionImage, selectedPortion.x, selectedPortion.y, pixelatedPortionImage.width, pixelatedPortionImage.height);
+                    }
+                    
+                    afterImgDataURL = canvas.toDataURL('image/png', 1.0);
+                    afterImg.src = afterImgDataURL;
+                    
+                    downloadLink.href = afterImgDataURL;
+                    downloadLink.download = '(pixelated) ' + file.name;
+                    
+                    show(outputContainer);
+                    
+                    pixelations.push(new Pixelation(pixelator, dataURL, afterImgDataURL));
                 }
                 
-                afterImgDataURL = canvas.toDataURL('image/png', 1.0);
-                afterImg.src = afterImgDataURL;
-                
-                downloadLink.href = afterImgDataURL;
-                downloadLink.download = '(pixelated) ' + file.name;
-                
-                show(outputContainer);
-                
-                pixelations.push(new Pixelation(pixelator, dataURL, afterImgDataURL));
+                startProgressBar(pixelator, 300);
+                setTimeout(finishPixelation, 0);
+                // A hacky attempt at getting the progress bar to work.
             });
             
             reader.readAsDataURL(file);
