@@ -22,7 +22,10 @@
         var sections = this.getAllSections(sectionWidth, sectionHeight),
             canvas = document.createElement('canvas'),
             ctx = canvas.getContext('2d'),
-            i = sections.length;
+            i = sections.length,
+            listeners = this.listeners.pixelate,
+            l = listeners.length,
+            progressListeners = this.listeners.progress;
         
         this.sectionsProcessed_ = 0;
         this.totalSections_ = sections.length;
@@ -32,12 +35,21 @@
         
         while (i--) {
             var section = sections[i],
-                average = this.getAverageColor(section);
+                average = this.getAverageColor(section),
+                pll = progressListeners.length;
             
             ctx.fillStyle = 'rgba(' + (average.r & 255) + ',' + (average.g & 255) + ',' + (average.b & 255) + ',' + (average.a & 255) / 255 + ')';
             ctx.fillRect(section.x, section.y, section.width, section.height);
             
+            while (pll--) {
+                progressListeners[pll](this, this.sectionsProcessed);
+            }
+            
             this.sectionsProcessed_++;
+        }
+        
+        while (l--) {
+            listeners[l](this, ctx);
         }
         
         return ctx;
@@ -105,6 +117,20 @@
     Pixelator.prototype.getProgress = function() {
         var progress = this.sectionsProcessed_ / this.totalSections_;
         return (isFinite(progress) && !isNaN(progress)) ? progress : 0;
+    };
+    
+    Pixelator.prototype.on = function(eventType, func) {
+        if (eventType in this.listeners) {
+            this.listeners[eventType].push(func);
+        } else {
+            throw new Error('The eventType argument (' + JSON.stringify(eventType) + ') is invalid.');
+        }
+    };
+    
+    Pixelator.prototype.listeners = {
+        pixelate: [],
+        progress: []/*,
+        filter: []*/
     };
     
     Pixelator.prototype.filters_ = [];
