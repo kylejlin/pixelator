@@ -115,11 +115,11 @@ var demo = (function() {
         progressBar.style.width = '0%';
         progressBarLabel.innerHTML = '0%';
         
-        function updateProgressBar(pixelator, progress) {
-            if (progress % 10 === 0) {
+        function updateProgressBar(pixelator, progress) {console.log(pixelator,progress);
+            if ((progress % 100) === 0) {
                 var progressFloat = this.getProgress(),
                     progressPercent = String(progressFloat * 100).slice(0, 6) + '%';
-                
+                console.log(progressFloat,progressPercent);
                 progressBar.style.width = progressPercent;
                 progressBarLabel.innerHTML = progressPercent;
             }
