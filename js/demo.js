@@ -12,6 +12,10 @@ var demo = (function() {
         heightInput = document.getElementById('section-height'),
         pixelateBtn = document.getElementById('pixelate-btn'),
         
+        progressDisplayContainer = document.getElementById('progress-display-container'),
+            progressBar = document.getElementById('progress-bar'),
+            progressBarLabel = document.getElementById('progress-bar-label'),
+        
         outputContainer = document.getElementById('output-container'),
             beforeImg = document.getElementById('before'),
             afterImg = document.getElementById('after'),
@@ -106,6 +110,26 @@ var demo = (function() {
         var file = fileInput.files[0];
         
         hide(errorContainer);
+        show(progressDisplayContainer);
+        
+        progressBar.style.width = '0%';
+        
+        function startProgressBar(pixelator, interval) {
+            var myId = setInterval(function() {
+                var progress = pixelator.getProgress(),
+                    progressPercent = String(progress * 100).slice(0, 6) + '%';
+                
+                progressBar.style.width = progressPercent;
+                progressBarLabel.innerHTML = progressPercent;
+                
+                if (progress === 1) {
+                    clearInterval(myId);
+                    console.log('cleared');
+                }
+            }, interval);
+            
+            return myId;
+        }
         
         if (file instanceof File && /\.(jpe?g|png|gif)$/i.test(file.name)) {
             var reader = new FileReader(),
@@ -141,9 +165,13 @@ var demo = (function() {
                     pixelator = new Pixelator(ctx.getImageData(selectedPortion.x, selectedPortion.y, selectedPortion.width, selectedPortion.height));
                 }
                 
+                var intervalId = startProgressBar(pixelator, 300);
+                
                 // TODO: Fix file type and put pixelated portion on original image.
                 pixelatedPortionURL = pixelator.pixelate((widthInput.value | 0) || 10, (heightInput.value | 0) || 10).canvas.toDataURL('image/png', 1);
                 pixelatedPortionImage.src = pixelatedPortionURL;
+                
+                //clearInterval(intervalId);
                 
                 if (useWholeImg) {
                     ctx.drawImage(pixelatedPortionImage, 0, 0, width, height);
