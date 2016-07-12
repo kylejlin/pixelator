@@ -29,7 +29,7 @@ var demo = (function() {
             updateCanvas: function() {
                 switch (this.status) {
                     case 0:
-                        selectPortionCtx.drawImage(currentImg, 0, 0, img.width, img.height);
+                        selectPortionCtx.drawImage(currentImg, 0, 0, currentImg.width, currentImg.height);
                         break;
                     
                     case 1:
