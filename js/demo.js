@@ -113,21 +113,14 @@ var demo = (function() {
         show(progressDisplayContainer);
         
         progressBar.style.width = '0%';
+        progressBarLabel.innerHTML = '0%';
         
-        function startProgressBar(pixelator, interval) {
-            var myId = setInterval(function() {
-                var progress = pixelator.getProgress(),
-                    progressPercent = String(progress * 100).slice(0, 6) + '%';
-                
-                progressBar.style.width = progressPercent;
-                progressBarLabel.innerHTML = progressPercent;
-                console.log(progress,progressPercent);
-                if (progress === 1) {
-                    clearInterval(myId);
-                }
-            }, interval);
+        function updateProgressBar() {
+            var progress = pixelator.getProgress(),
+                progressPercent = String(progress * 100).slice(0, 6) + '%';
             
-            return myId;
+            progressBar.style.width = progressPercent;
+            progressBarLabel.innerHTML = progressPercent;
         }
         
         if (file instanceof File && /\.(jpe?g|png|gif)$/i.test(file.name)) {
@@ -164,30 +157,26 @@ var demo = (function() {
                     pixelator = new Pixelator(ctx.getImageData(selectedPortion.x, selectedPortion.y, selectedPortion.width, selectedPortion.height));
                 }
                 
-                function finishPixelation() {
-                    pixelatedPortionURL = pixelator.pixelate((widthInput.value | 0) || 10, (heightInput.value | 0) || 10).canvas.toDataURL('image/png', 1);
-                    pixelatedPortionImage.src = pixelatedPortionURL;
-                    
-                    if (useWholeImg) {
-                        ctx.drawImage(pixelatedPortionImage, 0, 0, width, height);
-                    } else {
-                        ctx.drawImage(pixelatedPortionImage, selectedPortion.x, selectedPortion.y, pixelatedPortionImage.width, pixelatedPortionImage.height);
-                    }
-                    
-                    afterImgDataURL = canvas.toDataURL('image/png', 1.0);
-                    afterImg.src = afterImgDataURL;
-                    
-                    downloadLink.href = afterImgDataURL;
-                    downloadLink.download = '(pixelated) ' + file.name;
-                    
-                    show(outputContainer);
-                    
-                    pixelations.push(new Pixelation(pixelator, dataURL, afterImgDataURL));
+                pixelator.on('progress', updateProgressBar);
+                
+                pixelatedPortionURL = pixelator.pixelate((widthInput.value | 0) || 10, (heightInput.value | 0) || 10).canvas.toDataURL('image/png', 1);
+                pixelatedPortionImage.src = pixelatedPortionURL;
+                
+                if (useWholeImg) {
+                    ctx.drawImage(pixelatedPortionImage, 0, 0, width, height);
+                } else {
+                    ctx.drawImage(pixelatedPortionImage, selectedPortion.x, selectedPortion.y, pixelatedPortionImage.width, pixelatedPortionImage.height);
                 }
                 
-                startProgressBar(pixelator, 300);
-                setTimeout(finishPixelation, 301);
-                // A hacky attempt at getting the progress bar to work.
+                afterImgDataURL = canvas.toDataURL('image/png', 1.0);
+                afterImg.src = afterImgDataURL;
+                
+                downloadLink.href = afterImgDataURL;
+                downloadLink.download = '(pixelated) ' + file.name;
+                
+                show(outputContainer);
+                
+                pixelations.push(new Pixelation(pixelator, dataURL, afterImgDataURL, selectedPortion.clone()));
             });
             
             reader.readAsDataURL(file);
@@ -275,10 +264,11 @@ var demo = (function() {
         };
     }
     
-    function Pixelation(pixelator, beforeURL, afterURL) {
+    function Pixelation(pixelator, beforeURL, afterURL, selectedPortion) {
         this.pixelator = pixelator;
         this.beforeURL = beforeURL;
         this.afterURL = afterURL;
+        this.selectedPortion = selectedPortion;
         this.id = Pixelation.getId();
     }
     
