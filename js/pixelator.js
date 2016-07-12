@@ -24,6 +24,9 @@
             ctx = canvas.getContext('2d'),
             i = sections.length;
         
+        this.sectionsProcessed_ = 0;
+        this.totalSections_ = sections.length;
+        
         canvas.width = this.width;
         canvas.height = this.height;
         
@@ -33,6 +36,8 @@
             
             ctx.fillStyle = 'rgba(' + (average.r & 255) + ',' + (average.g & 255) + ',' + (average.b & 255) + ',' + (average.a & 255) / 255 + ')';
             ctx.fillRect(section.x, section.y, section.width, section.height);
+            
+            this.sectionsProcessed_++;
         }
         
         return ctx;
@@ -95,6 +100,11 @@
         avgColor.a = sumColor.a / numOfPixels;
         
         return avgColor;
+    };
+    
+    Pixelator.prototype.getProgress = function() {
+        var progress = this.sectionsProcessed_ / this.totalSections_;
+        return (isFinite(progress) && !isNaN(progress)) ? progress : 0;
     };
     
     Pixelator.prototype.filters_ = [];
