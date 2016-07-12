@@ -163,11 +163,10 @@ var demo = (function() {
     
     selectAll.addEventListener('change', function() {
         if (selectAll.checked) {
-            hide(selectPortion, clearSelection);
+            hide(selectPortionContainer);
         } else {
-            show(selectPortion, clearSelection);
+            show(selectPortionContainer);
         }
-        console.log(selectAll.checked);
     });
     
     selectPortion.addEventListener('click', function(e) {
