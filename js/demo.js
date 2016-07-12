@@ -38,11 +38,11 @@ var demo = (function() {
                         break;
                     
                     case 2:
-                        selectPortionCtx.fillStyle = this.SELECT_RECT_COLOR;
+                        selectPortionCtx.strokeStyle = this.SELECT_RECT_COLOR;
                         selectPortionCtx.lineWidth = this.SELECT_RECT_WIDTH;
                         selectPortionCtx.beginPath();
-                        selectPortion.rect(this.x, this.y, this.width, this.height);
-                        selectPortion.stroke();
+                        selectPortionCtx.rect(this.x, this.y, this.width, this.height);
+                        selectPortionCtx.stroke();
                 }
             },
             
@@ -59,17 +59,17 @@ var demo = (function() {
             },
             
             clone: function() {
-                var clone = {
-                    x: this.x,
-                    y: this.y,
-                    width: this.width,
-                    height: this.height,
-                    status: this.status
-                };
+                var clone = {};
                 
-                clone.updateCanvas = this.updateCanvas.bind(clone);
-                clone.reset = this.reset.bind(clone);
-                clone.clone = this.clone.bind(clone);
+                for (var key in this) {
+                    var value = this[key];
+                    
+                    if (typeof value === 'function') {
+                        clone[key] = value.bind(clone);
+                    } else {
+                        clone[key] = value;
+                    }
+                }
                 
                 return clone;
             }
