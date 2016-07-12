@@ -143,7 +143,7 @@ var demo = (function() {
                 pixelatedPortionURL = pixelator.pixelate((widthInput.value | 0) || 10, (heightInput.value | 0) || 10).canvas.toDataURL('image/png', 1);
                 pixelatedPortionImage.src = pixelatedPortionURL;
                 
-                ctx.drawImage(pixelatedPortionImage, 0, 0, pixelatedPortionImage.width, pixelatedPortionImage.height);
+                ctx.drawImage(pixelatedPortionImage, selectedPortion.x, selectedPortion.y, pixelatedPortionImage.width, pixelatedPortionImage.height);
                 afterImgDataURL = canvas.toDataURL('image/png', 1.0);
                 afterImg.src = afterImgDataURL;
                 
