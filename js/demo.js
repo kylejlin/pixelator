@@ -121,7 +121,9 @@ var demo = (function() {
                     width,
                     height,
                     
-                    pixelator;
+                    pixelator,
+                    
+                    useWholeImg = selectAll.checked || selectedPortion.width <= 0 || selectedPortion.height <= 0 || selectedPortion.status !== 2;
                 
                 beforeImg.src = dataURL;
                 
@@ -133,7 +135,7 @@ var demo = (function() {
                 
                 ctx.drawImage(beforeImg, 0, 0, width, height);
                 
-                if (selectAll.checked || selectedPortion.width <= 0 || selectedPortion.height <= 0 || selectedPortion.status !== 2) {
+                if (useWholeImg) {
                     pixelator = new Pixelator(ctx.getImageData(0, 0, width, height));
                 } else {
                     pixelator = new Pixelator(ctx.getImageData(selectedPortion.x, selectedPortion.y, selectedPortion.width, selectedPortion.height));
@@ -143,7 +145,12 @@ var demo = (function() {
                 pixelatedPortionURL = pixelator.pixelate((widthInput.value | 0) || 10, (heightInput.value | 0) || 10).canvas.toDataURL('image/png', 1);
                 pixelatedPortionImage.src = pixelatedPortionURL;
                 
-                ctx.drawImage(pixelatedPortionImage, selectedPortion.x, selectedPortion.y, pixelatedPortionImage.width, pixelatedPortionImage.height);
+                if (useWholeImg) {
+                    ctx.drawImage(pixelatedPortionImage, 0, 0, width, height);
+                } else {
+                    ctx.drawImage(pixelatedPortionImage, selectedPortion.x, selectedPortion.y, pixelatedPortionImage.width, pixelatedPortionImage.height);
+                }
+                
                 afterImgDataURL = canvas.toDataURL('image/png', 1.0);
                 afterImg.src = afterImgDataURL;
                 
