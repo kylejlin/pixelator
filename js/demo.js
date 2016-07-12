@@ -167,6 +167,7 @@ var demo = (function() {
         } else {
             show(selectPortion, clearSelection);
         }
+        console.log(selectAll.checked);
     });
     
     selectPortion.addEventListener('click', function(e) {
