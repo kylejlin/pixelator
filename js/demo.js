@@ -24,7 +24,7 @@ var demo = (function() {
             y: 0,
             status: 0,
             SELECT_RECT_COLOR: '#FFFFFF',
-            SELECT_RECT_WIDTH: '2',
+            SELECT_RECT_WIDTH: 2,
             
             updateCanvas: function() {
                 switch (this.status) {
