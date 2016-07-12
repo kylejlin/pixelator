@@ -115,9 +115,8 @@ var demo = (function() {
         progressBar.style.width = '0%';
         progressBarLabel.innerHTML = '0%';
         
-        function updateProgressBar() {
-            var progress = pixelator.getProgress(),
-                progressPercent = String(progress * 100).slice(0, 6) + '%';
+        function updateProgressBar(progress) {
+            var progressPercent = String(progress * 100).slice(0, 6) + '%';
             
             progressBar.style.width = progressPercent;
             progressBarLabel.innerHTML = progressPercent;
