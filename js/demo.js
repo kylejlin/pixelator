@@ -115,11 +115,14 @@ var demo = (function() {
         progressBar.style.width = '0%';
         progressBarLabel.innerHTML = '0%';
         
-        function updateProgressBar(progress) {
-            var progressPercent = String(progress * 100).slice(0, 6) + '%';
-            
-            progressBar.style.width = progressPercent;
-            progressBarLabel.innerHTML = progressPercent;
+        function updateProgressBar(pixelator, progress) {
+            if (progress % 10 === 0) {
+                var progressFloat = this.getProgress(),
+                    progressPercent = String(progressFloat * 100).slice(0, 6) + '%';
+                
+                progressBar.style.width = progressPercent;
+                progressBarLabel.innerHTML = progressPercent;
+            }
         }
         
         if (file instanceof File && /\.(jpe?g|png|gif)$/i.test(file.name)) {
