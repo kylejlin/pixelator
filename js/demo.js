@@ -121,10 +121,9 @@ var demo = (function() {
                 
                 progressBar.style.width = progressPercent;
                 progressBarLabel.innerHTML = progressPercent;
-                
+                console.log(progress,progressPercent);
                 if (progress === 1) {
                     clearInterval(myId);
-                    console.log('cleared');
                 }
             }, interval);
             
@@ -170,8 +169,6 @@ var demo = (function() {
                 // TODO: Fix file type and put pixelated portion on original image.
                 pixelatedPortionURL = pixelator.pixelate((widthInput.value | 0) || 10, (heightInput.value | 0) || 10).canvas.toDataURL('image/png', 1);
                 pixelatedPortionImage.src = pixelatedPortionURL;
-                
-                //clearInterval(intervalId);
                 
                 if (useWholeImg) {
                     ctx.drawImage(pixelatedPortionImage, 0, 0, width, height);
