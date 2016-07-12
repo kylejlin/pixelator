@@ -34,7 +34,7 @@ var demo = (function() {
                     
                     case 1:
                         selectPortionCtx.fillStyle = this.SELECT_RECT_COLOR;
-                        selectPortionCtx.fillRect(this.x, this.y, this.SELECT_RECT_WIDTH);
+                        selectPortionCtx.fillRect(this.x, this.y, this.SELECT_RECT_WIDTH, this.SELECT_RECT_WIDTH);
                         break;
                     
                     case 2:
@@ -92,7 +92,11 @@ var demo = (function() {
             
             reader.readAsDataURL(file);
             
-            show(selectPortionContainer);
+            if (selectAll.checked) {
+                hide(selectPortionContainer);
+            } else {
+                show(selectPortionContainer);
+            }
         } else {
             error('As of now, this tool only supports jpg, jpeg, png, and gif files.');
         }
