@@ -186,7 +186,7 @@ var demo = (function() {
                 }
                 
                 startProgressBar(pixelator, 300);
-                setTimeout(finishPixelation, 0);
+                setTimeout(finishPixelation, 301);
                 // A hacky attempt at getting the progress bar to work.
             });
             
