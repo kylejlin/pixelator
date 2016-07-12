@@ -12,7 +12,7 @@ var demo = (function() {
         heightInput = document.getElementById('section-height'),
         pixelateBtn = document.getElementById('pixelate-btn'),
         
-        progressDisplayContainer = document.getElementById('progress-display-container'),
+        progressDisplayContainer = document.getElementById('progress-display'),
             progressBar = document.getElementById('progress-bar'),
             progressBarLabel = document.getElementById('progress-bar-label'),
         
