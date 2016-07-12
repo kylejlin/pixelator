@@ -84,6 +84,9 @@ var demo = (function() {
             reader.addEventListener('load', function() {
                 currentImg.src = this.result;
                 
+                selectPortion.width = currentImg.width;
+                selectPortion.height = currentImg.height;
+                
                 selectedPortion.reset(true);
             });
             
