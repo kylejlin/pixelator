@@ -1,4 +1,4 @@
-(function () {
+(function() {
     /** Pixelator class. **/
     
     function Pixelator(imageData) {
@@ -42,7 +42,7 @@
             ctx.fillRect(section.x, section.y, section.width, section.height);
             
             while (pll--) {
-                progressListeners[pll](this, this.sectionsProcessed);
+                progressListeners[pll](this, this.sectionsProcessed_);
             }
             
             this.sectionsProcessed_++;
