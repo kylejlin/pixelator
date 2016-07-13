@@ -122,6 +122,7 @@ var demo = (function() {
                 console.log(progressFloat,progressPercent);
                 progressBar.style.width = progressPercent;
                 progressBarLabel.innerHTML = progressPercent;
+                console.log(progressBar.style.width, progresBarLabel.innerHTML);
             }
         }
         
