@@ -117,7 +117,7 @@ var demo = (function() {
         
         function updateProgressBar(pixelator, progress) {console.log(pixelator,progress);
             if ((progress % 100) === 0) {
-                var progressFloat = this.getProgress(),
+                var progressFloat = pixelator.getProgress(),
                     progressPercent = String(progressFloat * 100).slice(0, 6) + '%';
                 console.log(progressFloat,progressPercent);
                 progressBar.style.width = progressPercent;
