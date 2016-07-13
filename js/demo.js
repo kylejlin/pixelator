@@ -7,14 +7,13 @@ var demo = (function() {
             selectPortion = document.getElementById('select-portion'),
             selectPortionCtx = selectPortion.getContext('2d'),
             clearSelection = document.getElementById('clear-selection'),
+        
+        inProgressIndicator = document.getElementById('pixelation-in-progress'),
+        pixelationCompleteIndicator = document.getElementById('pixelation-complete'),
             
         widthInput = document.getElementById('section-width'),
         heightInput = document.getElementById('section-height'),
         pixelateBtn = document.getElementById('pixelate-btn'),
-        
-        progressDisplayContainer = document.getElementById('progress-display'),
-            progressBar = document.getElementById('progress-bar'),
-            progressBarLabel = document.getElementById('progress-bar-label'),
         
         outputContainer = document.getElementById('output-container'),
             beforeImg = document.getElementById('before'),
@@ -78,6 +77,7 @@ var demo = (function() {
                 return clone;
             }
         },
+        
         pixelations = [];
     
     fileInput.addEventListener('change', function() {
@@ -107,24 +107,13 @@ var demo = (function() {
     });
     
     pixelateBtn.addEventListener('click', function() {
+        updateStatus(false);
+    });
+    
+    pixelateBtn.addEventListener('click', function() {
         var file = fileInput.files[0];
         
         hide(errorContainer);
-        show(progressDisplayContainer);
-        
-        progressBar.style.width = '0%';
-        progressBarLabel.innerHTML = '0%';
-        
-        function updateProgressBar(pixelator, progress) {console.log(pixelator,progress);
-            if ((progress % 10) === 0) {
-                var progressFloat = pixelator.getProgress(),
-                    progressPercent = String(progressFloat * 100).slice(0, 6) + '%';
-                console.log(progressFloat,progressPercent);
-                progressBar.style.width = progressPercent;
-                progressBarLabel.innerHTML = progressPercent;
-                console.log(progressBar.style.width, progressBarLabel.innerHTML);
-            }
-        }
         
         if (file instanceof File && /\.(jpe?g|png|gif)$/i.test(file.name)) {
             var reader = new FileReader(),
@@ -160,8 +149,6 @@ var demo = (function() {
                     pixelator = new Pixelator(ctx.getImageData(selectedPortion.x, selectedPortion.y, selectedPortion.width, selectedPortion.height));
                 }
                 
-                pixelator.on('progress', updateProgressBar);
-                
                 pixelatedPortionURL = pixelator.pixelate((widthInput.value | 0) || 10, (heightInput.value | 0) || 10).canvas.toDataURL('image/png', 1);
                 pixelatedPortionImage.src = pixelatedPortionURL;
                 
@@ -176,6 +163,8 @@ var demo = (function() {
                 
                 downloadLink.href = afterImgDataURL;
                 downloadLink.download = '(pixelated) ' + file.name;
+                
+                updateStatus(true);
                 
                 show(outputContainer);
                 
@@ -265,6 +254,16 @@ var demo = (function() {
             x: event.x - rect.left,
             y: event.y - rect.top
         };
+    }
+    
+    function updateStatus(complete) {
+        if (complete) {
+            hide(inProgressIndicator);
+            show(pixelationCompleteIndicator);
+        } else {
+            hide(pixelationCompleteIndicator);
+            show(inProgressIndicator);
+        }
     }
     
     function Pixelation(pixelator, beforeURL, afterURL, selectedPortion) {
