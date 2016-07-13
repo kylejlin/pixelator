@@ -8,8 +8,9 @@ var demo = (function() {
             selectPortionCtx = selectPortion.getContext('2d'),
             clearSelection = document.getElementById('clear-selection'),
         
-        inProgressIndicator = document.getElementById('pixelation-in-progress'),
-        pixelationCompleteIndicator = document.getElementById('pixelation-complete'),
+        statusContainer = document.getElementById('status-display'),
+            inProgressIndicator = document.getElementById('pixelation-in-progress'),
+            pixelationCompleteIndicator = document.getElementById('pixelation-complete'),
             
         widthInput = document.getElementById('section-width'),
         heightInput = document.getElementById('section-height'),
@@ -107,6 +108,7 @@ var demo = (function() {
     });
     
     pixelateBtn.addEventListener('click', function() {
+        show(statusContainer);
         updateStatus(false);
     });
     
