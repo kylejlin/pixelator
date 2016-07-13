@@ -19,6 +19,7 @@ var demo = (function() {
         outputContainer = document.getElementById('output-container'),
             beforeImg = document.getElementById('before'),
             afterImg = document.getElementById('after'),
+            downloadNameInput = document.getElementById('download-name'),
             downloadLink = document.getElementById('download'),
         
         errorContainer = document.getElementById('error-container'),
@@ -166,6 +167,8 @@ var demo = (function() {
                 downloadLink.href = afterImgDataURL;
                 downloadLink.download = '(pixelated) ' + file.name;
                 
+                downloadNameInput.value = '(pixelated) ' + file.name;
+                
                 updateStatus(true);
                 
                 show(outputContainer);
@@ -224,6 +227,10 @@ var demo = (function() {
         if (userHasConfirmed) {
             selectedPortion.reset(true);
         }
+    });
+    
+    downloadNameInput.addEventListener('change', function() {
+        downloadLink.download = downloadNameInput.value;
     });
     
     function error(msg) {
