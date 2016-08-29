@@ -56,6 +56,16 @@ html, body {
   margin-bottom: 5px;
 }
 
+#link-to-my-profile {
+  text-decoration: none;
+  color: #ff6600;
+}
+
+#credits {
+  position: absolute;
+  top: 95%;
+}
+
 .btn {
   cursor: pointer;
 }
