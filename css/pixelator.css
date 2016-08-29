@@ -61,11 +61,6 @@ html, body {
   color: #ff6600;
 }
 
-#credits {
-  position: absolute;
-  top: 95%;
-}
-
 .btn {
   cursor: pointer;
 }
