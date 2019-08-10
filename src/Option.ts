@@ -10,6 +10,44 @@ export default class Option<T> {
     return NONE;
   }
 
+  static all<T>(options: Option<T>[]): Option<T[]>;
+  static all<A, B>(options: [Option<A>, Option<B>]): Option<[A, B]>;
+  static all<A, B, C>(
+    options: [Option<A>, Option<B>, Option<C>]
+  ): Option<[A, B, C]>;
+  static all<A, B, C, D>(
+    options: [Option<A>, Option<B>, Option<C>, Option<D>]
+  ): Option<[A, B, C, D]>;
+  static all<A, B, C, D, E>(
+    options: [Option<A>, Option<B>, Option<C>, Option<D>, Option<E>]
+  ): Option<[A, B, C, D, E]>;
+  static all<A, B, C, D, E, F>(
+    options: [Option<A>, Option<B>, Option<C>, Option<D>, Option<E>, Option<F>]
+  ): Option<[A, B, C, D, E, F]>;
+  static all<A, B, C, D, E, F, G>(
+    options: [
+      Option<A>,
+      Option<B>,
+      Option<C>,
+      Option<D>,
+      Option<E>,
+      Option<F>,
+      Option<G>
+    ]
+  ): Option<[A, B, C, D, E, F, G]>;
+  static all<A, B, C, D, E, F, G, H>(
+    options: [
+      Option<A>,
+      Option<B>,
+      Option<C>,
+      Option<D>,
+      Option<E>,
+      Option<F>,
+      Option<G>,
+      Option<H>
+    ]
+  ): Option<[A, B, C, D, E, F, G, H]>;
+
   static all<T>(options: Option<T>[]): Option<T[]> {
     let values = [];
     for (let i = 0; i < options.length; i++) {
