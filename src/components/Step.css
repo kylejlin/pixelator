@@ -1,0 +1,11 @@
+.Step {
+  margin-bottom: 20px;
+}
+
+.StepNumber {
+  font-weight: bold;
+}
+
+.StepDescription {
+  margin-bottom: 10px;
+}
