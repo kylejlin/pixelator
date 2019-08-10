@@ -4,24 +4,46 @@ import "./App.css";
 import Step from "./components/Step";
 
 import readFileAsHtmlImage from "./readFileAsHtmlImage";
+import Option from "./Option";
+import pixelateImage from "./pixelateImage";
 
 export default class App extends React.Component<{}, State> {
   private originalCanvasRef: React.RefObject<HTMLCanvasElement>;
+  private pixelatedCanvasRef: React.RefObject<HTMLCanvasElement>;
 
   constructor(props: {}) {
     super(props);
 
     this.state = {
-      stepsCompleted: 0
+      originalImg: Option.none(),
+      pixelWidthInputValue: "" + DEFAULT_PIXEL_SIZE,
+      pixelHeightInputValue: "" + DEFAULT_PIXEL_SIZE,
+      pixelationZone: Option.none()
     };
 
     this.originalCanvasRef = React.createRef();
+    this.pixelatedCanvasRef = React.createRef();
 
     this.bindMethods();
   }
 
   private bindMethods() {
-    this.onFileInputChange = this.onFileInputChange.bind(this);
+    this.onFileChange = this.onFileChange.bind(this);
+    this.onPixelWidthChange = this.onPixelWidthChange.bind(this);
+    this.onPixelHeightChange = this.onPixelHeightChange.bind(this);
+    this.syncPixelWidth = this.syncPixelWidth.bind(this);
+    this.syncPixelHeight = this.syncPixelHeight.bind(this);
+    this.onPixelateClick = this.onPixelateClick.bind(this);
+  }
+
+  componentDidMount() {
+    const originalCanvas = this.originalCanvasRef.current!;
+    originalCanvas.width = 0;
+    originalCanvas.height = 0;
+
+    const pixelatedCanvas = this.pixelatedCanvasRef.current!;
+    pixelatedCanvas.width = 0;
+    pixelatedCanvas.height = 0;
   }
 
   render() {
@@ -39,25 +61,42 @@ export default class App extends React.Component<{}, State> {
             <input
               type="file"
               accept=".jpg,.jpeg,.png,.gif"
-              onChange={this.onFileInputChange}
+              onChange={this.onFileChange}
             />
 
-            {this.state.stepsCompleted >= 1 && (
-              <div>
-                <p className="SuccessfulUploadNotification">
-                  Your image has been successfully uploaded!
-                </p>
-              </div>
-            )}
+            {this.state.originalImg.match({
+              none: () => null,
+              some: _img => (
+                <div>
+                  <p className="SuccessfulUploadNotification">
+                    Your image has been successfully uploaded!
+                  </p>
+                </div>
+              )
+            })}
           </Step>
 
           <Step number={2} instructions="Choose pixel size.">
             <label className="PixelDimensionLabel">
-              Width: <input type="number" value={10} />
+              Width:{" "}
+              <input
+                type="text"
+                pattern="\d*"
+                value={this.state.pixelWidthInputValue}
+                onChange={this.onPixelWidthChange}
+                onBlur={this.syncPixelWidth}
+              />
               px
             </label>
             <label className="PixelDimensionLabel">
-              Height: <input type="number" value={10} />
+              Height:{" "}
+              <input
+                type="text"
+                pattern="\d*"
+                value={this.state.pixelHeightInputValue}
+                onChange={this.onPixelHeightChange}
+                onBlur={this.syncPixelHeight}
+              />
               px
             </label>
           </Step>
@@ -74,7 +113,8 @@ export default class App extends React.Component<{}, State> {
           </Step>
 
           <Step number={4} instructions="">
-            <button>Pixelate it!</button>
+            <button onClick={this.onPixelateClick}>Pixelate it!</button>
+            <canvas ref={this.pixelatedCanvasRef} />
           </Step>
 
           <footer>
@@ -87,7 +127,7 @@ export default class App extends React.Component<{}, State> {
     );
   }
 
-  onFileInputChange(e: React.ChangeEvent) {
+  onFileChange(e: React.ChangeEvent) {
     const { files } = e.target as HTMLInputElement;
     if (files !== null) {
       const file = files[0];
@@ -99,7 +139,7 @@ export default class App extends React.Component<{}, State> {
           const ctx = canvas.getContext("2d")!;
           ctx.drawImage(img, 0, 0);
 
-          this.setState({ stepsCompleted: 1 });
+          this.setState({ originalImg: Option.some(img) });
         });
       } else {
         throw new TypeError(
@@ -108,8 +148,82 @@ export default class App extends React.Component<{}, State> {
       }
     }
   }
+
+  onPixelWidthChange(e: React.ChangeEvent) {
+    this.setState({
+      pixelWidthInputValue: (e.target as HTMLInputElement).value
+    });
+  }
+
+  onPixelHeightChange(e: React.ChangeEvent) {
+    this.setState({
+      pixelHeightInputValue: (e.target as HTMLInputElement).value
+    });
+  }
+
+  syncPixelWidth() {
+    this.setState({ pixelWidthInputValue: "" + this.pixelWidth() });
+  }
+
+  syncPixelHeight() {
+    this.setState({ pixelHeightInputValue: "" + this.pixelHeight() });
+  }
+
+  pixelWidth(): number {
+    const parsed = parseInt(this.state.pixelWidthInputValue, 10);
+    if (isLegalPixelSize(parsed)) {
+      return parsed;
+    } else {
+      return DEFAULT_PIXEL_SIZE;
+    }
+  }
+
+  pixelHeight(): number {
+    const parsed = parseInt(this.state.pixelHeightInputValue, 10);
+    if (isLegalPixelSize(parsed)) {
+      return parsed;
+    } else {
+      return DEFAULT_PIXEL_SIZE;
+    }
+  }
+
+  onPixelateClick() {
+    this.state.originalImg.ifSome(img => {
+      pixelateImage(img, this.pixelWidth(), this.pixelHeight()).then(
+        imgData => {
+          const canvas = this.pixelatedCanvasRef.current;
+          if (canvas !== null) {
+            canvas.width = imgData.width;
+            canvas.height = imgData.height;
+            const ctx = canvas.getContext("2d")!;
+            ctx.putImageData(imgData, 0, 0);
+          }
+        }
+      );
+    });
+  }
 }
 
 interface State {
-  stepsCompleted: number;
+  originalImg: Option<HTMLImageElement>;
+  pixelWidthInputValue: string;
+  pixelHeightInputValue: string;
+  pixelationZone: Option<Rect>;
+}
+
+interface Rect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+const DEFAULT_PIXEL_SIZE = 10;
+
+function isLegalPixelSize(size: number): boolean {
+  return !isNaN(size) && size > 0 && isInt(size);
+}
+
+function isInt(num: number): boolean {
+  return Math.floor(num) === num;
 }
