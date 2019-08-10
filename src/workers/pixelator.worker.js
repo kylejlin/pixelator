@@ -1,4 +1,4 @@
-const pixelateSync = require("../pixelateSync").default;
+const pixelateSync = require("../expensiveAlgorithms/pixelateSync").default;
 
 self.addEventListener("message", event => {
   const { data } = event;
