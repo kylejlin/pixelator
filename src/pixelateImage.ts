@@ -1,14 +1,14 @@
 import PixelatorWorker from "./workers/pixelator.worker";
 
 export default function pixelateImage(
-  img: HTMLImageElement,
+  img: CanvasImageSource & { width: number; height: number },
   pixelWidth: number,
   pixelHeight: number
 ): Promise<ImageData> {
   return new Promise((resolve, reject) => {
     // @ts-ignore
     const worker = new PixelatorWorker();
-    const imgBuffer = htmlImageToBuffer(img);
+    const imgBuffer = canvasImageSourceToBuffer(img);
     worker.postMessage(
       {
         type: "pixelate",
@@ -52,7 +52,9 @@ export default function pixelateImage(
   });
 }
 
-function htmlImageToBuffer(img: HTMLImageElement): ArrayBuffer {
+function canvasImageSourceToBuffer(
+  img: CanvasImageSource & { width: number; height: number }
+): ArrayBuffer {
   const canvas = document.createElement("canvas");
   canvas.width = img.width;
   canvas.height = img.height;
