@@ -46,6 +46,13 @@ main {
   padding-left: 10px;
 }
 
+.SuccessfulUploadNotification {
+  background-color: green;
+  padding: 5px;
+  border-radius: 5px;
+  display: inline-block;
+}
+
 .PixelDimensionLabel {
   display: block;
 }
