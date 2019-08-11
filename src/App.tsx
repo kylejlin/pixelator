@@ -394,21 +394,28 @@ export default class App extends React.Component<{}, State> {
   }
 
   onMouseMove(e: React.MouseEvent) {
-    this.state.dragState.ifSome(({ corner, initialZone }) => {
-      const [canvasX, canvasY] = this.getOriginalCanvasCoords(
-        e.clientX,
-        e.clientY
-      );
+    const { originalImg, dragState } = this.state;
+    Option.all([originalImg, dragState]).ifSome(
+      ([originalImg, { corner, initialZone }]) => {
+        const [canvasX, canvasY] = this.getOriginalCanvasCoords(
+          e.clientX,
+          e.clientY
+        );
 
-      this.setState(
-        {
-          pixelationZone: Option.some(
-            updateCorner(initialZone, corner, canvasX, canvasY)
-          )
-        },
-        this.drawOrClearPixelationZone
-      );
-    });
+        this.setState(
+          {
+            pixelationZone: Option.some(
+              clampRect(
+                updateCorner(initialZone, corner, canvasX, canvasY),
+                originalImg.width,
+                originalImg.height
+              )
+            )
+          },
+          this.drawOrClearPixelationZone
+        );
+      }
+    );
   }
 
   onMouseUp() {
@@ -560,4 +567,15 @@ function cropImage(
   const croppedCtx = cropped.getContext("2d")!;
   croppedCtx.putImageData(rectData, 0, 0);
   return cropped;
+}
+
+function clampRect(rect: Rect, width: number, height: number): Rect {
+  const x = Math.max(rect.x, 0);
+  const y = Math.max(rect.y, 0);
+  return {
+    x,
+    y,
+    width: Math.min(rect.width, width - x),
+    height: Math.min(rect.height, height - y)
+  };
 }
