@@ -20,6 +20,6 @@ export default function Step({
 
 interface Props {
   number: number;
-  instructions: string;
+  instructions?: string;
   children: React.ReactNode;
 }

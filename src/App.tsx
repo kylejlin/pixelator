@@ -25,11 +25,13 @@ export default class App extends React.Component<{}, State> {
 
     this.state = {
       originalImg: Option.none(),
+      fileName: Option.none(),
       pixelWidthInputValue: "" + DEFAULT_PIXEL_SIZE,
       pixelHeightInputValue: "" + DEFAULT_PIXEL_SIZE,
       pixelationZone: Option.none(),
       shouldPreserveNonPixelatedPortion: true,
-      dragState: Option.none()
+      dragState: Option.none(),
+      isPixelationComplete: false
     };
 
     this.originalCanvasRef = React.createRef();
@@ -46,6 +48,7 @@ export default class App extends React.Component<{}, State> {
     this.syncPixelWidth = this.syncPixelWidth.bind(this);
     this.syncPixelHeight = this.syncPixelHeight.bind(this);
     this.onPixelateClick = this.onPixelateClick.bind(this);
+    this.onDownloadClick = this.onDownloadClick.bind(this);
     this.onShouldUseEntireImageChange = this.onShouldUseEntireImageChange.bind(
       this
     );
@@ -100,9 +103,9 @@ export default class App extends React.Component<{}, State> {
         </header>
 
         <main>
-          <Step number={1} instructions="Upload an image.">
+          <Step number={1}>
             <label className="OrangeButton DisplayInlineBlock">
-              Upload
+              Upload an image
               <input
                 type="file"
                 accept=".jpg,.jpeg,.png,.gif"
@@ -180,7 +183,7 @@ export default class App extends React.Component<{}, State> {
             />
           </Step>
 
-          <Step number={4} instructions="">
+          <Step number={4}>
             <button
               onClick={this.onPixelateClick}
               className="DisplayBlock OrangeButton"
@@ -188,6 +191,22 @@ export default class App extends React.Component<{}, State> {
               Pixelate it!
             </button>
             <canvas ref={this.pixelatedCanvasRef} />
+          </Step>
+
+          <Step number={5}>
+            <button
+              onClick={this.onDownloadClick}
+              className="DisplayBlock OrangeButton"
+            >
+              Download
+            </button>
+            <p>
+              Download (either click the above button or{" "}
+              <code className="DownloadInstructions">
+                right-click -> Save Image As
+              </code>{" "}
+              the pixelated image).
+            </p>
           </Step>
 
           <footer>
@@ -217,7 +236,11 @@ export default class App extends React.Component<{}, State> {
           const ctx = canvas.getContext("2d")!;
           ctx.drawImage(img, 0, 0);
 
-          this.setState({ originalImg: Option.some(img) });
+          this.setState({
+            originalImg: Option.some(img),
+            fileName: Option.some(file.name),
+            isPixelationComplete: false
+          });
         });
       } else {
         throw new TypeError(
@@ -291,10 +314,24 @@ export default class App extends React.Component<{}, State> {
               canvas.height = imgData.height;
               ctx.putImageData(imgData, 0, 0);
             }
+            this.setState({ isPixelationComplete: true });
           }
         }
       );
     });
+  }
+
+  onDownloadClick() {
+    const canvas = this.pixelatedCanvasRef.current;
+    if (this.state.isPixelationComplete && canvas !== null) {
+      this.state.fileName.ifSome(fileName => {
+        const dataUrl = canvas.toDataURL("image/png", 1.0);
+        const a = document.createElement("a");
+        a.href = dataUrl;
+        a.download = stripExtension(fileName) + ".pixelated.png";
+        a.click();
+      });
+    }
   }
 
   onShouldUseEntireImageChange(e: React.ChangeEvent) {
@@ -476,11 +513,13 @@ export default class App extends React.Component<{}, State> {
 
 interface State {
   originalImg: Option<HTMLImageElement>;
+  fileName: Option<string>;
   pixelWidthInputValue: string;
   pixelHeightInputValue: string;
   pixelationZone: Option<Rect>;
   shouldPreserveNonPixelatedPortion: boolean;
   dragState: Option<{ corner: Corner; initialZone: Rect }>;
+  isPixelationComplete: boolean;
 }
 
 interface Rect {
@@ -627,4 +666,13 @@ function clampRect(rect: Rect, width: number, height: number): Rect {
     width: Math.min(rect.width, width - x),
     height: Math.min(rect.height, height - y)
   };
+}
+
+function stripExtension(fileName: string) {
+  const i = fileName.lastIndexOf(".");
+  if (i === -1) {
+    return fileName;
+  } else {
+    return fileName.slice(0, i);
+  }
 }

@@ -58,6 +58,14 @@ main {
   margin-bottom: 15px;
 }
 
+.DownloadInstructions {
+  font-family: monospace;
+  background-color: #ddd;
+  color: #000;
+  font-size: 1.2em;
+  padding: 0.1em;
+}
+
 footer {
   padding-top: 30px;
   padding-bottom: 5px;
