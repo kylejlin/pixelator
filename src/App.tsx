@@ -29,6 +29,7 @@ export default class App extends React.Component<{}, State> {
       pixelWidthInputValue: "" + DEFAULT_PIXEL_SIZE,
       pixelHeightInputValue: "" + DEFAULT_PIXEL_SIZE,
       pixelationZone: Option.none(),
+      pendingPixelationZone: Option.none(),
       shouldPreserveNonPixelatedPortion: true,
       dragState: Option.none(),
       isPixelationComplete: false
@@ -64,6 +65,19 @@ export default class App extends React.Component<{}, State> {
     this.nativeOnTouchMove = this.nativeOnTouchMove.bind(this);
     this.onMouseUp = this.onMouseUp.bind(this);
     this.onTouchEnd = this.onTouchEnd.bind(this);
+    this.onPendingPixelationZoneXChange = this.onPendingPixelationZoneXChange.bind(
+      this
+    );
+    this.onPendingPixelationZoneYChange = this.onPendingPixelationZoneYChange.bind(
+      this
+    );
+    this.onPendingPixelationZoneWidthChange = this.onPendingPixelationZoneWidthChange.bind(
+      this
+    );
+    this.onPendingPixelationZoneHeightChange = this.onPendingPixelationZoneHeightChange.bind(
+      this
+    );
+    this.syncPendingPixelationZone = this.syncPendingPixelationZone.bind(this);
   }
 
   componentDidMount() {
@@ -164,16 +178,67 @@ export default class App extends React.Component<{}, State> {
                   onChange={this.onShouldUseEntireImageChange}
                 />
               </label>
-              {this.state.pixelationZone.isSome() && (
-                <label className="DisplayBlock">
-                  Preserve non-pixelated portion of image
-                  <input
-                    type="checkbox"
-                    checked={this.state.shouldPreserveNonPixelatedPortion}
-                    onChange={this.onShouldPreserveNonPixelatedPortionChange}
-                  />
-                </label>
-              )}
+              {this.state.pixelationZone.match({
+                none: () => null,
+                some: currentPixelationZone => {
+                  const pendingPixelationZone = this.state.pendingPixelationZone.unwrapOrElse(
+                    () => rectToPendingRect(currentPixelationZone)
+                  );
+                  return (
+                    <>
+                      <div className="PixelationZoneCoordinates">
+                        <label className="DisplayBlock">
+                          x:{" "}
+                          <input
+                            type="text"
+                            value={pendingPixelationZone.x}
+                            onChange={this.onPendingPixelationZoneXChange}
+                            onBlur={this.syncPendingPixelationZone}
+                          />
+                        </label>
+                        <label className="DisplayBlock">
+                          y:{" "}
+                          <input
+                            type="text"
+                            value={pendingPixelationZone.y}
+                            onChange={this.onPendingPixelationZoneYChange}
+                            onBlur={this.syncPendingPixelationZone}
+                          />
+                        </label>
+                        <label className="DisplayBlock">
+                          width:{" "}
+                          <input
+                            type="text"
+                            value={pendingPixelationZone.width}
+                            onChange={this.onPendingPixelationZoneWidthChange}
+                            onBlur={this.syncPendingPixelationZone}
+                          />
+                        </label>
+                        <label className="DisplayBlock">
+                          height:{" "}
+                          <input
+                            type="text"
+                            value={pendingPixelationZone.height}
+                            onChange={this.onPendingPixelationZoneHeightChange}
+                            onBlur={this.syncPendingPixelationZone}
+                          />
+                        </label>
+                      </div>
+
+                      <label className="DisplayBlock">
+                        Preserve non-pixelated portion of image
+                        <input
+                          type="checkbox"
+                          checked={this.state.shouldPreserveNonPixelatedPortion}
+                          onChange={
+                            this.onShouldPreserveNonPixelatedPortionChange
+                          }
+                        />
+                      </label>
+                    </>
+                  );
+                }
+              })}
             </div>
 
             <canvas
@@ -500,7 +565,7 @@ export default class App extends React.Component<{}, State> {
     this.onPointerUp();
   }
 
-  onTouchEnd(e: React.TouchEvent) {
+  onTouchEnd() {
     this.onPointerUp();
   }
 
@@ -508,6 +573,82 @@ export default class App extends React.Component<{}, State> {
     this.setState({
       dragState: Option.none()
     });
+  }
+
+  onPendingPixelationZoneXChange(e: React.ChangeEvent) {
+    this.state.pixelationZone.ifSome(pixelationZone => {
+      const newX = (e.target as HTMLInputElement).value;
+      const original = this.state.pendingPixelationZone.unwrapOrElse(() =>
+        rectToPendingRect(pixelationZone)
+      );
+      this.setState({
+        pendingPixelationZone: Option.some({ ...original, x: newX })
+      });
+    });
+  }
+
+  onPendingPixelationZoneYChange(e: React.ChangeEvent) {
+    this.state.pixelationZone.ifSome(pixelationZone => {
+      const newY = (e.target as HTMLInputElement).value;
+      const original = this.state.pendingPixelationZone.unwrapOrElse(() =>
+        rectToPendingRect(pixelationZone)
+      );
+      this.setState({
+        pendingPixelationZone: Option.some({ ...original, y: newY })
+      });
+    });
+  }
+
+  onPendingPixelationZoneWidthChange(e: React.ChangeEvent) {
+    this.state.pixelationZone.ifSome(pixelationZone => {
+      const newWidth = (e.target as HTMLInputElement).value;
+      const original = this.state.pendingPixelationZone.unwrapOrElse(() =>
+        rectToPendingRect(pixelationZone)
+      );
+      this.setState({
+        pendingPixelationZone: Option.some({ ...original, width: newWidth })
+      });
+    });
+  }
+
+  onPendingPixelationZoneHeightChange(e: React.ChangeEvent) {
+    this.state.pixelationZone.ifSome(pixelationZone => {
+      const newHeight = (e.target as HTMLInputElement).value;
+      const original = this.state.pendingPixelationZone.unwrapOrElse(() =>
+        rectToPendingRect(pixelationZone)
+      );
+      this.setState({
+        pendingPixelationZone: Option.some({
+          ...original,
+          height: newHeight
+        })
+      });
+    });
+  }
+
+  syncPendingPixelationZone() {
+    const { originalImg, pixelationZone, pendingPixelationZone } = this.state;
+    Option.all([originalImg, pixelationZone, pendingPixelationZone]).ifSome(
+      ([originalImg, previousPixelationZone, pendingPixelationZone]) => {
+        this.setState(
+          {
+            pixelationZone: Option.some(
+              pendingRectToRect(pendingPixelationZone).match({
+                none: () => previousPixelationZone,
+                some: newPixelationZone =>
+                  clampRect(
+                    newPixelationZone,
+                    originalImg.width,
+                    originalImg.height
+                  )
+              })
+            ),
+            pendingPixelationZone: Option.none()
+          },
+          this.drawOrClearPixelationZone
+        );
+      }
+    );
   }
 }
 
@@ -517,6 +658,7 @@ interface State {
   pixelWidthInputValue: string;
   pixelHeightInputValue: string;
   pixelationZone: Option<Rect>;
+  pendingPixelationZone: Option<PendingRect>;
   shouldPreserveNonPixelatedPortion: boolean;
   dragState: Option<{ corner: Corner; initialZone: Rect }>;
   isPixelationComplete: boolean;
@@ -527,6 +669,13 @@ interface Rect {
   y: number;
   width: number;
   height: number;
+}
+
+interface PendingRect {
+  x: string;
+  y: string;
+  width: string;
+  height: string;
 }
 
 enum Corner {
@@ -674,5 +823,22 @@ function stripExtension(fileName: string) {
     return fileName;
   } else {
     return fileName.slice(0, i);
+  }
+}
+
+function rectToPendingRect(rect: Rect): PendingRect {
+  const { x, y, width, height } = rect;
+  return { x: "" + x, y: "" + y, width: "" + width, height: "" + height };
+}
+
+function pendingRectToRect(pr: PendingRect): Option<Rect> {
+  const x = parseInt(pr.x, 10);
+  const y = parseInt(pr.y, 10);
+  const width = parseInt(pr.width, 10);
+  const height = parseInt(pr.height, 10);
+  if (x >= 0 && y >= 0 && width > 0 && height > 0) {
+    return Option.some({ x, y, width, height });
+  } else {
+    return Option.none();
   }
 }
