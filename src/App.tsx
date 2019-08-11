@@ -118,7 +118,7 @@ export default class App extends React.Component<{}, State> {
 
         <main>
           <Step number={1}>
-            <label className="OrangeButton DisplayInlineBlock">
+            <label className="OrangeButton">
               Upload an image
               <input
                 type="file"
@@ -141,28 +141,32 @@ export default class App extends React.Component<{}, State> {
           </Step>
 
           <Step number={2} instructions="Choose pixel size.">
-            <label className="DisplayBlock">
-              Width:{" "}
-              <input
-                type="text"
-                pattern="\d*"
-                value={this.state.pixelWidthInputValue}
-                onChange={this.onPixelWidthChange}
-                onBlur={this.syncPixelWidth}
-              />
-              px
-            </label>
-            <label className="DisplayBlock">
-              Height:{" "}
-              <input
-                type="text"
-                pattern="\d*"
-                value={this.state.pixelHeightInputValue}
-                onChange={this.onPixelHeightChange}
-                onBlur={this.syncPixelHeight}
-              />
-              px
-            </label>
+            <div>
+              <label>
+                Width:{" "}
+                <input
+                  type="text"
+                  pattern="\d*"
+                  value={this.state.pixelWidthInputValue}
+                  onChange={this.onPixelWidthChange}
+                  onBlur={this.syncPixelWidth}
+                />
+                px
+              </label>
+            </div>
+            <div>
+              <label>
+                Height:{" "}
+                <input
+                  type="text"
+                  pattern="\d*"
+                  value={this.state.pixelHeightInputValue}
+                  onChange={this.onPixelHeightChange}
+                  onBlur={this.syncPixelHeight}
+                />
+                px
+              </label>
+            </div>
           </Step>
 
           <Step
@@ -170,14 +174,17 @@ export default class App extends React.Component<{}, State> {
             instructions="Choose the portion of the image to pixelate, or skip this step and the entire image will be pixelated."
           >
             <div className="PixelationZoneOptions">
-              <label className="DisplayBlock">
-                Select all
-                <input
-                  type="checkbox"
-                  checked={this.state.pixelationZone.isNone()}
-                  onChange={this.onShouldUseEntireImageChange}
-                />
-              </label>
+              <div>
+                <label>
+                  Select all
+                  <input
+                    type="checkbox"
+                    checked={this.state.pixelationZone.isNone()}
+                    onChange={this.onShouldUseEntireImageChange}
+                  />
+                </label>
+              </div>
+
               {this.state.pixelationZone.match({
                 none: () => null,
                 some: currentPixelationZone => {
@@ -187,54 +194,72 @@ export default class App extends React.Component<{}, State> {
                   return (
                     <>
                       <div className="PixelationZoneCoordinates">
-                        <label className="DisplayBlock">
-                          x:{" "}
+                        <div>
+                          <label>
+                            x:{" "}
+                            <input
+                              type="text"
+                              value={pendingPixelationZone.x}
+                              onChange={this.onPendingPixelationZoneXChange}
+                              onBlur={this.syncPendingPixelationZone}
+                            />
+                          </label>
+                        </div>
+
+                        <div>
+                          <label>
+                            y:{" "}
+                            <input
+                              type="text"
+                              value={pendingPixelationZone.y}
+                              onChange={this.onPendingPixelationZoneYChange}
+                              onBlur={this.syncPendingPixelationZone}
+                            />
+                          </label>
+                        </div>
+
+                        <div>
+                          {" "}
+                          <label>
+                            width:{" "}
+                            <input
+                              type="text"
+                              value={pendingPixelationZone.width}
+                              onChange={this.onPendingPixelationZoneWidthChange}
+                              onBlur={this.syncPendingPixelationZone}
+                            />
+                          </label>
+                        </div>
+
+                        <div>
+                          <label>
+                            height:{" "}
+                            <input
+                              type="text"
+                              value={pendingPixelationZone.height}
+                              onChange={
+                                this.onPendingPixelationZoneHeightChange
+                              }
+                              onBlur={this.syncPendingPixelationZone}
+                            />
+                          </label>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label>
+                          Preserve non-pixelated portion of image
                           <input
-                            type="text"
-                            value={pendingPixelationZone.x}
-                            onChange={this.onPendingPixelationZoneXChange}
-                            onBlur={this.syncPendingPixelationZone}
-                          />
-                        </label>
-                        <label className="DisplayBlock">
-                          y:{" "}
-                          <input
-                            type="text"
-                            value={pendingPixelationZone.y}
-                            onChange={this.onPendingPixelationZoneYChange}
-                            onBlur={this.syncPendingPixelationZone}
-                          />
-                        </label>
-                        <label className="DisplayBlock">
-                          width:{" "}
-                          <input
-                            type="text"
-                            value={pendingPixelationZone.width}
-                            onChange={this.onPendingPixelationZoneWidthChange}
-                            onBlur={this.syncPendingPixelationZone}
-                          />
-                        </label>
-                        <label className="DisplayBlock">
-                          height:{" "}
-                          <input
-                            type="text"
-                            value={pendingPixelationZone.height}
-                            onChange={this.onPendingPixelationZoneHeightChange}
-                            onBlur={this.syncPendingPixelationZone}
+                            type="checkbox"
+                            checked={
+                              this.state.shouldPreserveNonPixelatedPortion
+                            }
+                            onChange={
+                              this.onShouldPreserveNonPixelatedPortionChange
+                            }
                           />
                         </label>
                       </div>
-
-                      <label className="DisplayBlock">
-                        Preserve non-pixelated portion of image
-                        <input
-                          type="checkbox"
-                          checked={this.state.shouldPreserveNonPixelatedPortion}
-                          onChange={
-                            this.onShouldPreserveNonPixelatedPortionChange
-                          }
-                        />
-                      </label>
                     </>
                   );
                 }
@@ -249,20 +274,14 @@ export default class App extends React.Component<{}, State> {
           </Step>
 
           <Step number={4}>
-            <button
-              onClick={this.onPixelateClick}
-              className="DisplayBlock OrangeButton"
-            >
+            <button onClick={this.onPixelateClick} className="OrangeButton">
               Pixelate it!
             </button>
             <canvas ref={this.pixelatedCanvasRef} />
           </Step>
 
           <Step number={5}>
-            <button
-              onClick={this.onDownloadClick}
-              className="DisplayBlock OrangeButton"
-            >
+            <button onClick={this.onDownloadClick} className="OrangeButton">
               Download
             </button>
             <p>
