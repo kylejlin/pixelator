@@ -118,7 +118,7 @@ export default class App extends React.Component<{}, State> {
 
         <main>
           <Step number={1}>
-            <label className="OrangeButton">
+            <label className="OrangeButton OrangeButton--inlineBlock">
               Upload an image
               <input
                 type="file"
