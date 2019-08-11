@@ -88,6 +88,21 @@ export default class Option<T> {
     this.map(executor);
   }
 
+  unwrap(): T {
+    return this.expect("Tried to call unwrap() on Option::None");
+  }
+
+  expect(message: string | Error): T {
+    return this.match({
+      none: () => {
+        const error =
+          "string" === typeof message ? new Error(message) : message;
+        throw error;
+      },
+      some: value => value
+    });
+  }
+
   unwrapOr<D>(defaultValue: D): T | D {
     return this.match({
       none: () => defaultValue,
