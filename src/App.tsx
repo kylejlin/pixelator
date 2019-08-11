@@ -229,54 +229,34 @@ export default class App extends React.Component<{}, State> {
   }
 
   onPixelateClick() {
-    this.state.originalImg.ifSome(img => {
-      this.state.pixelationZone.match({
-        none: () => {
-          pixelateImage(img, this.pixelWidth(), this.pixelHeight()).then(
-            imgData => {
-              const canvas = this.pixelatedCanvasRef.current;
-              if (canvas !== null) {
-                canvas.width = imgData.width;
-                canvas.height = imgData.height;
-                const ctx = canvas.getContext("2d")!;
-                ctx.putImageData(imgData, 0, 0);
-              }
+    this.state.originalImg.ifSome(originalImg => {
+      const imgToPixelate = this.state.pixelationZone.match({
+        none: () => originalImg,
+        some: zone => cropImage(originalImg, zone)
+      });
+      pixelateImage(imgToPixelate, this.pixelWidth(), this.pixelHeight()).then(
+        imgData => {
+          const canvas = this.pixelatedCanvasRef.current;
+          if (canvas !== null) {
+            const ctx = canvas.getContext("2d")!;
+
+            if (
+              this.state.pixelationZone.isSome() &&
+              this.state.shouldPreserveNonPixelatedPortion
+            ) {
+              const zone = this.state.pixelationZone.unwrap();
+              canvas.width = originalImg.width;
+              canvas.height = originalImg.height;
+              ctx.drawImage(originalImg, 0, 0);
+              ctx.putImageData(imgData, zone.x, zone.y);
+            } else {
+              canvas.width = imgData.width;
+              canvas.height = imgData.height;
+              ctx.putImageData(imgData, 0, 0);
             }
-          );
-        },
-        some: zone => {
-          if (this.state.shouldPreserveNonPixelatedPortion) {
-            const cropped = cropImage(img, zone);
-            console.log(cropped);
-            pixelateImage(cropped, this.pixelWidth(), this.pixelHeight()).then(
-              imgData => {
-                const canvas = this.pixelatedCanvasRef.current;
-                if (canvas !== null) {
-                  canvas.width = img.width;
-                  canvas.height = img.height;
-                  const ctx = canvas.getContext("2d")!;
-                  ctx.drawImage(img, 0, 0);
-                  ctx.putImageData(imgData, zone.x, zone.y);
-                  console.log(imgData, zone);
-                }
-              }
-            );
-          } else {
-            const cropped = cropImage(img, zone);
-            pixelateImage(cropped, this.pixelWidth(), this.pixelHeight()).then(
-              imgData => {
-                const canvas = this.pixelatedCanvasRef.current;
-                if (canvas !== null) {
-                  canvas.width = imgData.width;
-                  canvas.height = imgData.height;
-                  const ctx = canvas.getContext("2d")!;
-                  ctx.putImageData(imgData, 0, 0);
-                }
-              }
-            );
           }
         }
-      });
+      );
     });
   }
 
