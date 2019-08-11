@@ -56,33 +56,19 @@ class Pixelator {
   private getAllSections(): Section[] {
     const { pixelWidth, pixelHeight } = this;
     const sections: Section[] = [];
-    const rightEdgeSectionWidth = this.imgWidth % pixelWidth || pixelWidth;
-    const bottomEdgeSectionHeight = this.imgHeight % pixelHeight || pixelHeight;
-    const rightEdgeSectionX = this.imgWidth - rightEdgeSectionWidth;
-    const bottomEdgeSectionY = this.imgHeight - bottomEdgeSectionHeight;
 
-    function addAllSectionsForRow(y: number, height: number) {
-      sections.push(
-        new Section(rightEdgeSectionX, y, rightEdgeSectionWidth, height)
-      );
+    let y = 0;
+    while (y < this.imgHeight) {
+      const height = Math.min(this.imgHeight - y, pixelHeight);
 
-      let x = rightEdgeSectionX - pixelHeight;
-
-      while (x >= 0) {
-        sections.push(new Section(x, y, pixelWidth, height));
-
-        x -= pixelWidth;
+      let x = 0;
+      while (x < this.imgWidth) {
+        const width = Math.min(this.imgWidth - x, pixelWidth);
+        sections.push({ x, y, width, height });
+        x += width;
       }
-    }
 
-    addAllSectionsForRow(bottomEdgeSectionY, bottomEdgeSectionHeight);
-
-    let y = bottomEdgeSectionY - pixelHeight;
-
-    while (y >= 0) {
-      addAllSectionsForRow(y, pixelHeight);
-
-      y -= pixelHeight;
+      y += height;
     }
 
     return sections;
@@ -145,13 +131,11 @@ class Pixelator {
   }
 }
 
-class Section {
-  constructor(
-    public x: number,
-    public y: number,
-    public width: number,
-    public height: number
-  ) {}
+interface Section {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
 }
 
 interface Rgba {
