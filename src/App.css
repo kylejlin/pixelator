@@ -82,3 +82,13 @@ footer {
   margin: 0.2em;
   outline: none;
 }
+
+.GitHubLink {
+  text-decoration: none;
+  font-weight: bold;
+  color: #ff6600;
+}
+
+.GitHubLink:hover {
+  color: #ff8822;
+}

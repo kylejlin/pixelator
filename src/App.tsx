@@ -169,8 +169,13 @@ export default class App extends React.Component<{}, State> {
 
           <footer>
             Pixelator's source code can be found on{" "}
-            <a href="https://github.com/kyljelin/pixelator">Github</a> under the
-            MIT License.
+            <a
+              href="https://github.com/kylejlin/pixelator"
+              className="GitHubLink"
+            >
+              GitHub
+            </a>{" "}
+            under the MIT License.
           </footer>
         </main>
       </div>
