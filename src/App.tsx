@@ -82,11 +82,15 @@ export default class App extends React.Component<{}, State> {
 
         <main>
           <Step number={1} instructions="Upload an image.">
-            <input
-              type="file"
-              accept=".jpg,.jpeg,.png,.gif"
-              onChange={this.onFileChange}
-            />
+            <label className="OrangeButton DisplayInlineBlock">
+              Upload
+              <input
+                type="file"
+                accept=".jpg,.jpeg,.png,.gif"
+                onChange={this.onFileChange}
+                className="DisplayNone"
+              />
+            </label>
 
             {this.state.originalImg.match({
               none: () => null,
@@ -101,7 +105,7 @@ export default class App extends React.Component<{}, State> {
           </Step>
 
           <Step number={2} instructions="Choose pixel size.">
-            <label className="PixelDimensionLabel">
+            <label className="DisplayBlock">
               Width:{" "}
               <input
                 type="text"
@@ -112,7 +116,7 @@ export default class App extends React.Component<{}, State> {
               />
               px
             </label>
-            <label className="PixelDimensionLabel">
+            <label className="DisplayBlock">
               Height:{" "}
               <input
                 type="text"
@@ -129,7 +133,7 @@ export default class App extends React.Component<{}, State> {
             number={3}
             instructions="Choose the portion of the image to pixelate, or skip this step and the entire image will be pixelated."
           >
-            <label>
+            <label className="DisplayBlock">
               Select all
               <input
                 type="checkbox"
@@ -138,7 +142,7 @@ export default class App extends React.Component<{}, State> {
               />
             </label>
             {this.state.pixelationZone.isSome() && (
-              <label>
+              <label className="DisplayBlock">
                 Preserve non-pixelated portion of image
                 <input
                   type="checkbox"
@@ -154,7 +158,12 @@ export default class App extends React.Component<{}, State> {
           </Step>
 
           <Step number={4} instructions="">
-            <button onClick={this.onPixelateClick}>Pixelate it!</button>
+            <button
+              onClick={this.onPixelateClick}
+              className="DisplayBlock OrangeButton"
+            >
+              Pixelate it!
+            </button>
             <canvas ref={this.pixelatedCanvasRef} />
           </Step>
 
