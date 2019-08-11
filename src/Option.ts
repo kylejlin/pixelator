@@ -109,6 +109,13 @@ export default class Option<T> {
       some: value => value
     });
   }
+
+  unwrapOrElse<D>(defaultValueThunk: () => D): T | D {
+    return this.match({
+      none: () => defaultValueThunk(),
+      some: value => value
+    });
+  }
 }
 
 const NONE = (() => {
