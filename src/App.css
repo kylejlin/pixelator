@@ -54,21 +54,13 @@ main {
   display: inline-block;
 }
 
+.PixelationZoneOptions {
+  margin-bottom: 15px;
+}
+
 footer {
   padding-top: 30px;
   padding-bottom: 5px;
-}
-
-.DisplayBlock {
-  display: block;
-}
-
-.DisplayInlineBlock {
-  display: inline-block;
-}
-
-.DisplayNone {
-  display: none;
 }
 
 .OrangeButton {
@@ -91,4 +83,16 @@ footer {
 
 .GitHubLink:hover {
   color: #ff8822;
+}
+
+.DisplayBlock {
+  display: block;
+}
+
+.DisplayInlineBlock {
+  display: inline-block;
+}
+
+.DisplayNone {
+  display: none;
 }

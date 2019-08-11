@@ -15,6 +15,7 @@ const NON_PRESERVED_INDICATOR_COLOR = "#000a";
 export default class App extends React.Component<{}, State> {
   private originalCanvasRef: React.RefObject<HTMLCanvasElement>;
   private pixelatedCanvasRef: React.RefObject<HTMLCanvasElement>;
+  private appContainerRef: React.RefObject<HTMLDivElement>;
 
   constructor(props: {}) {
     super(props);
@@ -33,6 +34,7 @@ export default class App extends React.Component<{}, State> {
 
     this.originalCanvasRef = React.createRef();
     this.pixelatedCanvasRef = React.createRef();
+    this.appContainerRef = React.createRef();
 
     this.bindMethods();
   }
@@ -52,8 +54,13 @@ export default class App extends React.Component<{}, State> {
     );
     this.drawOrClearPixelationZone = this.drawOrClearPixelationZone.bind(this);
     this.onOriginalCanvasMouseDown = this.onOriginalCanvasMouseDown.bind(this);
+    this.onOriginalCanvasTouchStart = this.onOriginalCanvasTouchStart.bind(
+      this
+    );
     this.onMouseMove = this.onMouseMove.bind(this);
+    this.nativeOnTouchMove = this.nativeOnTouchMove.bind(this);
     this.onMouseUp = this.onMouseUp.bind(this);
+    this.onTouchEnd = this.onTouchEnd.bind(this);
   }
 
   componentDidMount() {
@@ -64,14 +71,26 @@ export default class App extends React.Component<{}, State> {
     const pixelatedCanvas = this.pixelatedCanvasRef.current!;
     pixelatedCanvas.width = 0;
     pixelatedCanvas.height = 0;
+
+    const appContainer = this.appContainerRef.current!;
+    appContainer.addEventListener("touchmove", this.nativeOnTouchMove, {
+      passive: false
+    });
+  }
+
+  componentWillUnmount() {
+    const appContainer = this.appContainerRef.current!;
+    appContainer.removeEventListener("touchmove", this.nativeOnTouchMove);
   }
 
   render() {
     return (
       <div
         className="App"
+        ref={this.appContainerRef}
         onMouseMove={this.onMouseMove}
         onMouseUp={this.onMouseUp}
+        onTouchEnd={this.onTouchEnd}
       >
         <header>
           <h1>Pixelator</h1>
@@ -133,27 +152,31 @@ export default class App extends React.Component<{}, State> {
             number={3}
             instructions="Choose the portion of the image to pixelate, or skip this step and the entire image will be pixelated."
           >
-            <label className="DisplayBlock">
-              Select all
-              <input
-                type="checkbox"
-                checked={this.state.pixelationZone.isNone()}
-                onChange={this.onShouldUseEntireImageChange}
-              />
-            </label>
-            {this.state.pixelationZone.isSome() && (
+            <div className="PixelationZoneOptions">
               <label className="DisplayBlock">
-                Preserve non-pixelated portion of image
+                Select all
                 <input
                   type="checkbox"
-                  checked={this.state.shouldPreserveNonPixelatedPortion}
-                  onChange={this.onShouldPreserveNonPixelatedPortionChange}
+                  checked={this.state.pixelationZone.isNone()}
+                  onChange={this.onShouldUseEntireImageChange}
                 />
               </label>
-            )}
+              {this.state.pixelationZone.isSome() && (
+                <label className="DisplayBlock">
+                  Preserve non-pixelated portion of image
+                  <input
+                    type="checkbox"
+                    checked={this.state.shouldPreserveNonPixelatedPortion}
+                    onChange={this.onShouldPreserveNonPixelatedPortionChange}
+                  />
+                </label>
+              )}
+            </div>
+
             <canvas
               ref={this.originalCanvasRef}
               onMouseDown={this.onOriginalCanvasMouseDown}
+              onTouchStart={this.onOriginalCanvasTouchStart}
             />
           </Step>
 
@@ -360,11 +383,19 @@ export default class App extends React.Component<{}, State> {
   }
 
   onOriginalCanvasMouseDown(e: React.MouseEvent) {
+    this.onOriginalCanvasPointerDown(e.clientX, e.clientY);
+  }
+
+  onOriginalCanvasTouchStart(e: React.TouchEvent) {
+    this.onOriginalCanvasPointerDown(
+      e.touches[0].clientX,
+      e.touches[0].clientY
+    );
+  }
+
+  onOriginalCanvasPointerDown(x: number, y: number) {
     this.state.pixelationZone.ifSome(zone => {
-      const [canvasX, canvasY] = this.getOriginalCanvasCoords(
-        e.clientX,
-        e.clientY
-      );
+      const [canvasX, canvasY] = this.getOriginalCanvasCoords(x, y);
 
       this.setState({
         dragState: getDraggedCorner(
@@ -394,13 +425,23 @@ export default class App extends React.Component<{}, State> {
   }
 
   onMouseMove(e: React.MouseEvent) {
+    e.preventDefault();
+    this.onPointerMove(e.clientX, e.clientY);
+  }
+
+  nativeOnTouchMove(e: TouchEvent) {
+    if (this.state.dragState.isSome()) {
+      e.preventDefault();
+    }
+
+    this.onPointerMove(e.touches[0].clientX, e.touches[0].clientY);
+  }
+
+  onPointerMove(x: number, y: number) {
     const { originalImg, dragState } = this.state;
     Option.all([originalImg, dragState]).ifSome(
       ([originalImg, { corner, initialZone }]) => {
-        const [canvasX, canvasY] = this.getOriginalCanvasCoords(
-          e.clientX,
-          e.clientY
-        );
+        const [canvasX, canvasY] = this.getOriginalCanvasCoords(x, y);
 
         this.setState(
           {
@@ -419,6 +460,14 @@ export default class App extends React.Component<{}, State> {
   }
 
   onMouseUp() {
+    this.onPointerUp();
+  }
+
+  onTouchEnd(e: React.TouchEvent) {
+    this.onPointerUp();
+  }
+
+  onPointerUp() {
     this.setState({
       dragState: Option.none()
     });
