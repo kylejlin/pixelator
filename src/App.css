@@ -6,7 +6,8 @@
   border: 0;
   margin: 0;
 
-  font-family: Verdana, Geneva, sans-serif;
+  --font-family: Verdana, Geneva, sans-serif;
+  font-family: var(--font-family);
   color: #ffffff;
   background-color: #ffcc00;
 }
@@ -53,11 +54,31 @@ main {
   display: inline-block;
 }
 
-.PixelDimensionLabel {
-  display: block;
-}
-
 footer {
   padding-top: 30px;
   padding-bottom: 5px;
+}
+
+.DisplayBlock {
+  display: block;
+}
+
+.DisplayInlineBlock {
+  display: inline-block;
+}
+
+.DisplayNone {
+  display: none;
+}
+
+.OrangeButton {
+  background-color: #ff6600;
+  color: #fff;
+  font-family: var(--font-family);
+  font-size: 1.5em;
+  padding: 0.5em;
+  border: none;
+  border-radius: 0.3em;
+  margin: 0.2em;
+  outline: none;
 }
