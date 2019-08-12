@@ -8,7 +8,7 @@ Click [here](https://kylejlin.github.io/pixelator) to check it out.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-It uses [React App Rewired](https://github.com/timarney/react-app-rewired) as a wrapper around CRA in order to support Web Workers, which are used to pixelate on a non-blocking thread.
+As of the time of writing this, Create React App doesn't support Web Workers out of the box. Consequently, a separate webpack project (under the `workers/` directory) is used to compile the workers. The output is written to `public/workers/`.
 
 ## Pixelation algorithm
 

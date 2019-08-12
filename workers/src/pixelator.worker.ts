@@ -1,6 +1,8 @@
-const pixelateSync = require("../expensiveAlgorithms/pixelateSync").default;
+import pixelateSync from "./expensiveAlgorithms/pixelateSync";
 
-self.addEventListener("message", event => {
+const self_ = self as DedicatedWorkerGlobalScope;
+
+self_.addEventListener("message", (event: MessageEvent) => {
   const { data } = event;
 
   switch (data.type) {
@@ -16,7 +18,7 @@ self.addEventListener("message", event => {
           data.pixelWidth,
           data.pixelHeight
         );
-        self.postMessage(
+        self_.postMessage(
           {
             type: "succeeded",
             imgWidth: pixelatedImgData.width,
@@ -26,7 +28,10 @@ self.addEventListener("message", event => {
           [pixelatedImgData.data.buffer]
         );
       } catch (error) {
-        self.postMessage({ type: "failed", error });
+        self_.postMessage({
+          type: "failed",
+          error
+        });
       }
     default:
       throw new TypeError("Unexpected message type: " + event.data.type);

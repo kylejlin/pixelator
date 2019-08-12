@@ -1,4 +1,4 @@
-import PixelatorWorker from "./workers/pixelator.worker";
+import getWorkerUrl from "./getWorkerUrl";
 
 export default function pixelateImage(
   img: CanvasImageSource & { width: number; height: number },
@@ -7,7 +7,7 @@ export default function pixelateImage(
 ): Promise<ImageData> {
   return new Promise((resolve, reject) => {
     // @ts-ignore
-    const worker = new PixelatorWorker();
+    const worker = new Worker(getWorkerUrl("pixelator"));
     const imgBuffer = canvasImageSourceToBuffer(img);
     worker.postMessage(
       {
